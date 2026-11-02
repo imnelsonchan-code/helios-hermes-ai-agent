@@ -1,8 +1,6 @@
 # Take-profit redesign proposal
 
-Hong Kong Chinese: [`TP-PROPOSAL.zh-HK.md`](TP-PROPOSAL.zh-HK.md)
-
-Operational risk-control specification. Non-investment advice.
+Operational risk-control specification. Non-investment advice. (English-only public snapshot.)
 
 **Status: atr-chandelier-v1 is the preferred adopt policy.** `risk_plan_migrate.py`
 defaults to chandelier; existing `atr-r-v2` OPEN rows upgrade via `--adopt`

@@ -1,8 +1,8 @@
 # Zoe — Hermes refined draft (H-W1)
-> Not Helios prompts · Not live Hermes host · Scrubbed for review
+> Documentation snapshot · Not a live Hermes host · Scrubbed for public review
 
 Mapped from shared Hermes `hermes/skills/` (export-redacted inventory). Zoe **challenges** Alice/Eliza profile skills under `profiles/*/skills/` — Zoe does **not** author those trees.  
-Parent: [`../zoe/SOUL.md`](SOUL.md) · matrix: [`../../AGENTS.md`](../../AGENTS.md) §4.
+Parent: [`../zoe/SOUL.md`](SOUL.md) · desk contracts: [`../../docs/desk-artifact-contracts.md`](../../docs/desk-artifact-contracts.md).
 
 **Legend:** ✅ keep for Zoe refine · ⚠️ optional / support · ❌ exclude from Zoe core (wrong owner or ops/secret surface)
 
@@ -17,7 +17,7 @@ Parent: [`../zoe/SOUL.md`](SOUL.md) · matrix: [`../../AGENTS.md`](../../AGENTS.
 | `investment/data-quality-audit` | ✅ | Claim-vs-evidence; Round 2+ revised drafts. Scrub week-specific incident IDs / personal examples. |
 | `investment/scoring-engine-audit-checklist` | ✅ | When challenging T&M / scoring-engine change claims (logic, scale, determinism) — audit **claims**, not author scoring. |
 
-**Output contract (Helios-aligned):** challenge task → JSON `{verdict, severity, summary, items[]}`; data-QA task → JSON completeness shape (see SOUL §3–§4).
+**Output contract:** challenge task → JSON `{verdict, severity, summary, items[]}`; data-QA task → JSON completeness shape (see SOUL §3–§4).
 
 ---
 
@@ -110,4 +110,4 @@ Primary folders consulted:
 - `hermes/skills/investment/` — challenge, rubrics, DQ, scoring audit, research/financial helpers  
 - `hermes/skills/investigation/moa-investigation`  
 - Profile SOUL: `hermes/profiles/zoe/SOUL.md` (redacted export)  
-- Helios reference: `app/agents/prompts/zoe.md`, `docs/AGENTS.md`
+- Private sibling agent matrices are not published in this snapshot

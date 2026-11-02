@@ -270,12 +270,12 @@ def main() -> int:
         if stale:
             print(f"[fedwatch-cron] FRESHNESS: {fstatus} as_of={as_of} "
                   f"age={fage if fage is not None else '?'}d — report row MUST "
-                  f"carry 「institutional stale, sentiment-only」")
+                  f"carry 'institutional stale, sentiment-only'")
         return 0
     if stale:
         print(f"[fedwatch-cron] WARNING: primary institutional source stale "
               f"as_of={as_of} age={fage if fage is not None else '?'}d (>3d) — "
-              f"report row MUST carry 「institutional stale, sentiment-only」; "
+              f"report row MUST carry 'institutional stale, sentiment-only'; "
               f"do not silently cite {as_of} values")
         return 0
     print(f"[fedwatch-cron] OK {today} as_of={as_of} "

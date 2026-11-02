@@ -1,5 +1,5 @@
 # Eliza — Hermes refined draft (H-W1)
-> Not Helios prompts · Not live Hermes host · Scrubbed for review
+> Documentation snapshot · Not a live Hermes host · Scrubbed for public review
 
 **Skills checklist** — mapped from the shared Hermes investment-skill inventory and historical Eliza profile snapshots.
 
@@ -23,7 +23,7 @@ For **this Git refine tree**, Eliza's source of truth is `SOUL.md` plus this che
 - **Exclude** = T&M / Alice-only / Zoe-only / ops — do not treat as Eliza core.  
 - **Legacy name** = mentioned in old SOUL; not found as a top-level shared skill folder in focused archive — confirm before OSS pack.
 
-Helios `app/agents/prompts/eliza.md` tasks are **reference only**; this file does not change Helios.
+External prompt matrices are **reference only**; this file does not change other codebases.
 
 ### Skill resolution
 
@@ -56,8 +56,8 @@ Helios `app/agents/prompts/eliza.md` tasks are **reference only**; this file doe
 ### Track A/B vs Option A/B (checklist note)
 
 - Screener / width reports use Hermes **Track A** (Large+Mid) and **Track B** (Small Cap) as **report chapters / screen universes**.  
-- That is **≠** Helios Eliza enhancement **Option A/B** (cache / DCF v3).  
-- H-W1 documents format expectation only — **no** Helios `render_weekly_value` swap.
+- That is **≠** prior Eliza enhancement **Option A/B** (cache / DCF v3).  
+- H-W1 documents format expectation only — **no** host `render_weekly_value` swap.
 
 ### Scoring namespace
 
@@ -123,9 +123,9 @@ Documentation only; not a skills tree. Vetoes via `value_veto.py` do not fold in
 | `investment/request-eliza-valuation` | inbound | Alice/Renee pattern to request Eliza valuation | **Inbound** |
 | `investment/investment-profile-architecture` (+ `references/eliza-micro-analyst.md`) | architecture | Role boundary reference | **Keep** (reference) |
 
-### Helios-aligned task labels (skills-layer mapping · no code)
+### desk-aligned task labels (skills-layer mapping · no code)
 
-| Helios-aligned label | Skills / checklist focus |
+| desk-aligned label | Skills / checklist focus |
 |----------------------|--------------------------|
 | Width narrative + revise | `skills/valuation-width` + `valuation-screener` + `finviz-screener` + `yahoo-finance-data-fetch` + `financial-health`; Zoe items → Response Tracker; `## Session summary` + `## Market insight` + News/Market + Lenses; inbox `valuation-width/*-revised.md` |
 | Daily **value-session** | `skills/value-session` — Desk-pack #4: Market insight + News/Market + Lenses + movers vs Sunday lock; Zoe → eliza revise → `inbox/value-session/*-revised.md`; **not** Alice-arm-only; required `## Session summary` + `## Market insight`; provenance `as_of` |
@@ -187,8 +187,8 @@ Not pinned in this draft. Select in Hermes setup / `hermes model`. MOA (if used)
 - [x] Inventory from shared `hermes/skills/` (valuation-related)  
 - [x] Scrub paths / secrets / IDs / MEMORY / holdings  
 - [x] P-VAL boundaries; E5 never blend with T&M  
-- [x] Track A/B report chapters ≠ Helios Option A/B  
-- [x] A-08 + daily value-session (+ valuation-width) **profile skills landed**; D-X8 value overlay still Helios-aligned **docs only**  
+- [x] Track A/B report chapters ≠ Option A/B  
+- [x] A-08 + daily value-session (+ valuation-width) **profile skills landed**; D-X8 value overlay still desk-aligned **docs only**  
 
 - [x] Phase-3: daily `value-session/` portal path; `## Session summary` + valuation stance; not Alice-arm-only
 - [x] Git source-of-truth separated from historical shared/link/profile-local resolution

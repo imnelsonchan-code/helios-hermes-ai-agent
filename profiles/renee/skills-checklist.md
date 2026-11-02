@@ -1,5 +1,5 @@
 # Renee — Hermes refined draft (H-W1)
-> Not Helios prompts · Not live Hermes host · Scrubbed for review
+> Documentation snapshot · Not a live Hermes host · Scrubbed for public review
 
 **Agent:** `renee` · **Process:** **P-TM**  
 **Source map:** shared `hermes/skills/` (trading + T&M-related investment / reporting / communication / investigation) + **profile skills** under `profiles/renee/skills/*/SKILL.md` (P0: `tm-session-report` / `tm-signal-funnel` / `tm-e5-firewall`).  
@@ -28,7 +28,7 @@ Status legend: **Keep** · **Optional** · **Archive-ref** · **Out** (not Renee
 **Load order (narrative):**  
 `tm-e5-firewall` (always) → `tm-session-report` (trunk) → `tm-regime-exposure` (narrate only) → `tm-signal-funnel` (when daily-eval exists; else N/A) + shared `trading/*` Keep skills.
 
-**Apply ops:** `scripts/apply-to-hermes.sh` includes `RENEE_SKILLS` (mirrors `ELIZA_SKILLS`). Do not apply until owner runs the script.
+**Apply ops:** private host apply path should include `RENEE_SKILLS` (mirrors `ELIZA_SKILLS`). Do not apply until the operator runs that path.
 
 ---
 
@@ -38,12 +38,12 @@ Status legend: **Keep** · **Optional** · **Archive-ref** · **Out** (not Renee
 |------------|--------|----------------------|----------------------|
 | `trading/technical-analysis` | **Keep** | 5-indicator scoring, bilingual T&M report sections, entry/SL/TP narration | Keep methodology + section language rules. Strip host paths, Telegram delivery ops, live pipeline IDs. Prefer pack truth over inventing levels. |
 | `trading/stock-screener` | **Keep** | Universe screen + ranked picks with `score_breakdown` | Equities only; no ETFs. Soften hard-coded universe size to “T&M universe / Stage-2 tm pack”; no personal holdings. |
-| `trading/market-regime` | **Keep** | Trending / ranging / choppy / volatile → threshold & size adjust | Keep regime logic summary. Scrub script host paths. Align daily Option G note with Helios (weekly = no Option G). |
+| `trading/market-regime` | **Keep** | Trending / ranging / choppy / volatile → threshold & size adjust | Keep regime logic summary. Scrub script host paths. Align daily Option G note with desk cadence (weekly = no Option G). |
 | `trading/macro-filter` | **Keep** | Alice macro → confidence / size overlay (not hard gate) | Keep overlay semantics. No knowledge-base host paths or chat IDs. |
 | `trading/risk-management` | **Keep** | Kelly / bracket sizing / drawdown caps / SL discipline | Keep rule tables as research guidance. Strip account numbers, live portfolio facts, broker links. |
 | `trading/trade-journal` | **Keep** | Weekly bracket WR vs backtest; suggestion review | Scrub live CSV paths, share counts, GBP/USD fill examples, personal P&amp;L. Keep review *shape* only. |
 | `trading/chart-generator` | **Optional** | Annotated charts for reports / Zoe verify | Scrub workspace absolute paths; keep chart types + dark-theme defaults as style notes. |
-| `trading/breakout-scan-rules` | **Optional** | Stage-1 breakout / consolidation filter (Hermes pipeline) | Keep rule intent. Scrub ticker-count ops trivia; no holdings. Mark as Hermes-pipeline heritage — Helios Stage-1 may differ. |
+| `trading/breakout-scan-rules` | **Optional** | Stage-1 breakout / consolidation filter (Hermes pipeline) | Keep rule intent. Scrub ticker-count ops trivia; no holdings. Mark as Hermes-pipeline heritage — Stage-1 rules may differ by host. |
 | `trading/trade-journal-maintenance` | **Archive-ref** | Journal integrity / phantom SELL hygiene | **Do not** copy cron/job IDs, `<hermes-home>/...` paths, or sample fills into drafts. Ops-only; not narrative identity. |
 
 ---
@@ -75,8 +75,8 @@ Status legend: **Keep** · **Optional** · **Archive-ref** · **Out** (not Renee
 
 | Archive skill | Status | Note |
 |---------------|--------|------|
-| `.archive/tm-exit-rules` | **Archive-ref** + **D-X8 align** | Historical T&amp;M exit *rules* prose. Helios alignment: Renee **proposes tm exit overlay** (D-X8) — **documentation only** in H-W1; not Hermes code change; daily fire remains script (D-X8b). |
-| `.archive/renee-weekly-watchlist-gen` | **Archive-ref** | Legacy watchlist Track naming heritage. Scrub script paths. **≠** Eliza width **report Track A/B** chapters (Large+Mid vs Small Cap). Helios may treat watchlist as later car — do not invent Track tables. |
+| `.archive/tm-exit-rules` | **Archive-ref** + **D-X8 align** | Historical T&amp;M exit *rules* prose. desk alignment: Renee **proposes tm exit overlay** (D-X8) — **documentation only** in H-W1; not Hermes code change; daily fire remains script (D-X8b). |
+| `.archive/renee-weekly-watchlist-gen` | **Archive-ref** | Legacy watchlist Track naming heritage. Scrub script paths. **≠** Eliza width **report Track A/B** chapters (Large+Mid vs Small Cap). A reference desk may treat watchlist as later car — do not invent Track tables. |
 | `.archive/renee-atr14-entry-sl-tp` | **Archive-ref** | ATR14 entry/SL/TP formulas — methodology still useful when pack supplies `atr14` / levels. |
 | `.archive/renee-data-integrity-hash` | **Out** / ops | Integrity hashing — scrub entirely from public drafts. |
 
@@ -111,7 +111,7 @@ Status legend: **Keep** · **Optional** · **Archive-ref** · **Out** (not Renee
 | Saturday T&amp;M self-review | **`tm-signal-funnel`** (Mon–Fri roll-up), `trading/trade-journal`, scoring notes |
 | Screen / rank support | `trading/stock-screener`, `investment/scoring-engine-v4.4` + **`tm-e5-firewall`** |
 | Risk / sizing language | `trading/risk-management` |
-| D-X8 tm overlay propose (doc align) | `.archive/tm-exit-rules` (ref) + Helios EXIT-PLAN concepts · **no Hermes code in H-W1** |
+| D-X8 tm overlay propose (doc align) | `.archive/tm-exit-rules` (ref) + desk EXIT-PLAN concepts · **no Hermes code in H-W1** |
 
 ---
 

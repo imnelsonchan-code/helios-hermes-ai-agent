@@ -12,7 +12,7 @@ description: >-
 **Owner:** Alice · **Train:** weekly calendar / integrate  
 **Load with:** weekly integrate or standalone calendar card. Observation desk — **not** broker positioning.
 
-Mark "Not investment advice".source grading：`📊 Institutional` / `📰 News` / `📊 Data` / `⚠️ Social`(social rare here).
+Mark "Not investment advice".source grading:`📊 Institutional` / `📰 News` / `📊 Data` / `⚠️ Social`(social rare here).
 
 ---
 
@@ -52,8 +52,8 @@ Mark "Not investment advice".source grading：`📊 Institutional` / `📰 News`
 
 Prefer:
 
-- Draft: `shared/reports/alice/YYYY-Www-catalysts-draft.md`（+ workspace OK）
-- After Zoe: `inbox/analysis/YYYY-Www-catalysts-revised.md`（canonical third layer — portal needs `*-revised.md`）
+- Draft: `shared/reports/alice/YYYY-Www-catalysts-draft.md`(+ workspace OK)
+- After Zoe: `inbox/analysis/YYYY-Www-catalysts-revised.md`(canonical third layer — portal needs `*-revised.md`)
 - Optional shared copy of revised same basename for weekly train
 
 Optional market-close pointer: one line under next-session watch → inbox revised path.  
@@ -112,6 +112,6 @@ Impact **H/M/L** = expected tape relevance only — not a score or sleeve rank.
 ## Integrate checklist
 
 1. Fill all tables; label every miss  
-2. Draft → shared；Zoe → `*-revised.md` in canonical `inbox/analysis/`  
+2. Draft → shared;Zoe → `*-revised.md` in canonical `inbox/analysis/`  
 3. Optional close-wrap pointer (one line → revised path)  
 4. Zoe gate → Alice revise → final  

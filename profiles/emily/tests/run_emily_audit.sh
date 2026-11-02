@@ -370,17 +370,17 @@ else
  ok "obs-backtest not in Keep EXPECTED_SKILLS load chain"
 fi
 
-# 5f2 — christina-macro-bridge exists and is OUT of Keep load (Receive／optional)
+# 5f2 — christina-macro-bridge exists and is OUT of Keep load (Receive/optional)
 BRIDGE_SKILL="${SKILLS}/christina-macro-bridge/SKILL.md"
 if [[ -f "$BRIDGE_SKILL" ]]; then
- ok "christina-macro-bridge SKILL.md present (Receive／optional)"
+ ok "christina-macro-bridge SKILL.md present (Receive/optional)"
 else
  fail "missing christina-macro-bridge/SKILL.md"
 fi
-if [[ -f "$BRIDGE_SKILL" ]] && grep -Eq 'not in|Receive／optional|Receive/optional|receive-only|receive only' "$BRIDGE_SKILL"; then
- ok "christina-macro-bridge declares Receive／optional / not in Keep"
+if [[ -f "$BRIDGE_SKILL" ]] && grep -Eq 'not in|Receive/optional|Receive/optional|receive-only|receive only' "$BRIDGE_SKILL"; then
+ ok "christina-macro-bridge declares Receive/optional / not in Keep"
 else
- fail "christina-macro-bridge must declare Receive／optional / not in Keep"
+ fail "christina-macro-bridge must declare Receive/optional / not in Keep"
 fi
 if printf '%s\n' "${EXPECTED_SKILLS[@]}" | grep -qx 'christina-macro-bridge'; then
  fail "EXPECTED_SKILLS must not include christina-macro-bridge"
@@ -427,7 +427,7 @@ for stub in eia-wpsr usda-wasde-psd cftc-cot-disagg; do
  ok "Later stub not in Keep load: ${stub}"
  fi
 done
-if grep -Eq 'Stub[ /／]+Later' "${EMILY}/SOUL.md" \
+if grep -Eq 'Stub[ //]+Later' "${EMILY}/SOUL.md" \
  && grep -Eq 'Stub/Later' "${EMILY}/skills-checklist.md"; then
  ok "SOUL + checklist mark P1 stubs as Stub/Later"
 else

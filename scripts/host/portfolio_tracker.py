@@ -8,7 +8,7 @@ Part 1 — Portfolio P&L:
   3. Cost basis = Shares × Price (not the unreliable GBP Amount column)
   4. GBP-native rows (empty/zero Total USD) convert at GBP->USD; USD-native
      rows get a GBP companion at the same rate. Report shows both together.
-  5. Partial sells leave remaining shares OPEN (e.g. SGLN.L 32)
+  5. Partial sells leave remaining shares OPEN (e.g. TST1.L 32)
   6. Silent when healthy; Telegram on drawdown >8%. Win-rate vs backtest
      only alerts when closed-trade n ≥ 10.
 

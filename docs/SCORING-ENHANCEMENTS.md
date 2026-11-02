@@ -91,9 +91,9 @@ Live Hermes host now has:
 | Scoring eval daily | `<scoring-eval-daily-job-id>` | Mon–Fri 23:59 | `scoring_eval_daily.py` |
 | Scoring IC → eval weekly | `<scoring-ic-weekly-job-id>` | Sun 19:00 | `scoring_ic_eval_train.sh` (IC then `scoring_eval_weekly.py`) |
 
-Apply pool: `./scripts/apply-host-scripts.sh`
+Apply pool: sync `scripts/host/` onto the Hermes host with your private apply path.
 
-- After Option G ADX P0 hardening (`tm_variant.py` + `scoring_eval_daily.py`), re-run `./scripts/apply-host-scripts.sh` so the live host picks up threshold / missing-ADX / funnel-exit fixes before the next `<scoring-eval-daily-job-id>` run. Then `./scripts/apply-to-hermes.sh` for Renee SOUL funnel cite rules.
+- After Option G ADX P0 hardening (`tm_variant.py` + `scoring_eval_daily.py`), sync the host script pool and re-apply Renee SOUL funnel cite rules via that private path before the next `<scoring-eval-daily-job-id>` run.
 
 Pack meta contract (promoted by `pack_meta_stamp.py`, not invented):
 

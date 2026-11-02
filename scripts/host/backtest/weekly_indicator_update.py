@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
- Indicator — market close 。
+ Indicator — market close .
 
 :
 1. optimal periods (JSON fallback → hardcoded defaults)
@@ -117,7 +117,7 @@ def load_universe():
 # ── ─────────────────────────────────────────────────────────
 
 def load_optimal_periods():
-    """ optimal periods JSON，fallback hardcoded defaults。"""
+    """ optimal periods JSON,fallback hardcoded defaults."""
     if os.path.exists(OPTIMAL_PATH):
         try:
             with open(OPTIMAL_PATH, "r", encoding="utf-8") as f:
@@ -133,9 +133,9 @@ def load_optimal_periods():
             print(f"[ℹ] optimal periods {OPTIMAL_PATH}")
             return periods
         except (KeyError, json.JSONDecodeError, IOError) as e:
-            print(f"[⚠] optimal periods ({e})，fallback defaults")
+            print(f"[⚠] optimal periods ({e}),fallback defaults")
     else:
-        print(f"[ℹ] {OPTIMAL_PATH} ， hardcoded defaults")
+        print(f"[ℹ] {OPTIMAL_PATH} , hardcoded defaults")
     return dict(DEFAULT_OPTIMAL)
 
 
@@ -178,7 +178,7 @@ def weekly_spy_adx_true_wilder(spy_weekly, length: int = 14):
 
 def get_regime(spy_weekly):
     """
-     — SPY ADX + VIX。
+     — SPY ADX + VIX.
     Returns: 'trending' | 'ranging' | 'volatile'
 
     SPY ADX: canonical true-Wilder ADX(14) via weekly_spy_adx_true_wilder()
@@ -209,7 +209,7 @@ def get_regime(spy_weekly):
 
 
 def should_run(force=False):
-    """/， --force。"""
+    """/, --force."""
     if force:
         return True
     today = datetime.now(timezone.utc)
@@ -219,9 +219,9 @@ def should_run(force=False):
 
 def fetch_weekly_data(ticker, periods_needed=1500):
     """
-     yfinance (5≈1500)，resample 。
-     SMA200 ( ≈ 200)。
-     (df_weekly, success_bool)。
+     yfinance (5≈1500),resample .
+     SMA200 ( ≈ 200).
+     (df_weekly, success_bool).
     """
     try:
         stock = yf.Ticker(ticker)
@@ -254,7 +254,7 @@ def fetch_weekly_data(ticker, periods_needed=1500):
 
 def calc_indicators(weekly, opt):
     """
-     pandas_ta ， dict。
+     pandas_ta , dict.
     :
       weekly: DataFrame with OHLCV columns
       opt: periods config dict
@@ -380,7 +380,7 @@ def calc_indicators(weekly, opt):
 
 
 def insert_snapshot(conn, ticker, week_end, opt, raw, scores, total, regime="trending", dmi_direction="neutral"):
-    """INSERT weekly_snapshots。"""
+    """INSERT weekly_snapshots."""
     period_json = json.dumps(opt, ensure_ascii=False)
     conn.execute(
         """INSERT OR REPLACE INTO weekly_snapshots
@@ -482,7 +482,7 @@ def main():
     dry_run = "--dry-run" in sys.argv
 
     if not should_run(force):
-        print("[⏹] (Sat/Sun)，skip。 --force 。")
+        print("[⏹] (Sat/Sun),skip. --force .")
         return 0
 
     week_end = get_week_end()
@@ -583,7 +583,7 @@ def main():
             # Use the actual last trading day as week_end (not +1 day)
             # On Saturday/Sunday, this gives us Friday's date which is current
             week_end = latest_friday.strftime("%Y-%m-%d") if hasattr(latest_friday, 'strftime') else str(latest_friday.date())
-            print(f"\n[📅] : {week_end}（ {latest_friday.strftime('%Y-%m-%d') if hasattr(latest_friday, 'strftime') else latest_friday} Friday）")
+            print(f"\n[📅] : {week_end}( {latest_friday.strftime('%Y-%m-%d') if hasattr(latest_friday, 'strftime') else latest_friday} Friday)")
             print(f"[{i:2d}/{len(universe)}] {ticker:5s} ... ", end="", flush=True)
 
         raw = calc_indicators(weekly, opt)

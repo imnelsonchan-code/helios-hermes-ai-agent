@@ -16,7 +16,7 @@ description: >-
 **Not:** Alice news ledger · social heat alone for regime · broker Emily / M7 orders · desk-wide Risk-on/off final call  
 **Firewall:** display **"emily · commodities"**; voice never written as broker **Emily**
 
-Label "Not investment advice · observation only". Source grading: `📊 Data` / `📰 News` / `📊 Institutional`。
+Label "Not investment advice · observation only". Source grading: `📊 Data` / `📰 News` / `📊 Institutional`.
 
 ---
 
@@ -24,7 +24,7 @@ Label "Not investment advice · observation only". Source grading: `📊 Data` /
 
 ### Daily lite
 
-- After header must have **`## Session summary`**（5–8 bullets + `commodity_regime`）+ **`## Market insight`**（cite `commodity-insight`）
+- After header must have **`## Session summary`**(5–8 bullets + `commodity_regime`)+ **`## Market insight`**(cite `commodity-insight`)
 - dual-leg price table ten rows + Trade map Signal  + ≤3 rows full Obs entry/SL/TP
 - **Cite:** insight / direction / forecast (ten-column short table or cell miss; ❌ skip entire section) · world 3–5 · puzzle ≥3
 - ten-column full history not required (major release exceptions: crop reports, ICE softs, OPEC, etc.)
@@ -100,8 +100,8 @@ commodity-sources-crawl
 
 | Commodity | US primary print | UK/EU | Notes |
 |-----------|-------------|-------|------|
-| Gold | `XAU`（gold-api） | `SGLN.L` | indicative spot vs ETC; `GC=F` footnote only (futures≠spot) |
-| Silver | `XAG`（gold-api） | `PHAG.L` | ❌ `XAG-USD` · ❌ Yahoo `XAGUSD=X`；`SI=F`  footnote（futures≠spot） |
+| Gold | `XAU`(gold-api) | `SGLN.L` | indicative spot vs ETC; `GC=F` footnote only (futures≠spot) |
+| Silver | `XAG`(gold-api) | `PHAG.L` | ❌ `XAG-USD` · ❌ Yahoo `XAGUSD=X`;`SI=F`  footnote(futures≠spot) |
 | Copper | `HG=F` | `COPA.L` | futures≠spot; tag `futures≠spot` |
 | Soy | `ZS=F` | `SOYB`* | CBOT vs proxy |
 | Wheat | `ZW=F` | `WEAT`* | … |
@@ -124,27 +124,27 @@ LSE 0 / NaN → `miss`; GBp quotes must be disclosed.
 | Daily | `shared/reports/emily/YYYY-MM-DD-commodity-session.md` | `inbox/commodities-session/YYYY-MM-DD-commodities-session-revised.md` |
 | Weekly | `shared/reports/emily/YYYY-Www-commodities-session.md` | `inbox/commodities-session/YYYY-Www-*-revised.md` |
 
-**Train:** draft → Zoe → **emily revise** → `inbox/commodities-session/*-revised.md` (3-layer).If the revise landed only on the draft filename, run `python3 ~/.hermes/scripts/desk_pack_revised_gate.py`（promotes only when the Zoe challenge file is older than the draft; does not rename an unreviewed draft）。  
-**Inbox resolve (hard):** on-disk ONLY under `$REPORTS_INBOX/`. Logical `inbox/…` = stem-only shorthand. ❌ `~/.hermes/shared/inbox/` · ❌ `shared/reports/<profile>/inbox/`。
+**Train:** draft → Zoe → **emily revise** → `inbox/commodities-session/*-revised.md` (3-layer).If the revise landed only on the draft filename, run `python3 ~/.hermes/scripts/desk_pack_revised_gate.py`(promotes only when the Zoe challenge file is older than the draft; does not rename an unreviewed draft).  
+**Inbox resolve (hard):** on-disk ONLY under `$REPORTS_INBOX/`. Logical `inbox/…` = stem-only shorthand. ❌ `~/.hermes/shared/inbox/` · ❌ `shared/reports/<profile>/inbox/`.
 
 ---
 
 ## Required sections / tables
 
 1. Header (Not investment advice · emily≠Emily · as-of)  
-2. **`## Session summary`**（；5–8 bullets + `commodity_regime` + Alice pull → Market insight）
+2. **`## Session summary`**(;5–8 bullets + `commodity_regime` + Alice pull → Market insight)
 3. Dual price table (ten rows; **US↔UK attribution**)  
-4. World→commodity（cite）  
+4. World→commodity(cite)  
 5. **`## Market insight`** (required; cite / embed `commodity-insight` — SSOT title; do not use separate `## Commodity insight`)  
 6. **News / Market check** (before finalizing Scenario / levels)  
-7. **Direction**（cite `commodity-direction` · `DIR_*`）  
+7. **Direction**(cite `commodity-direction` · `DIR_*`)  
 8. **Forecast / Scenario** (cite `commodity-forecast`; Daily ten-column short table or cell miss; ❌ skip entire section)  
-9. Puzzle（≥3 blocks）  
+9. Puzzle(≥3 blocks)  
 10. **Lenses + Dominant**  
 11. Commodity calendar (near-term public windows)  
-12. Cite-or-miss lenses（inventory/term/COT）  
+12. Cite-or-miss lenses(inventory/term/COT)  
 13. History (**weekly mandatory ten columns** 1M / 3M / 1Y; Scenario **cite forecast**, do not rewrite)  
-14. Trade map（cite `commodity-signal-table`；**Basis cite Forecast**）  
+14. Trade map(cite `commodity-signal-table`;**Basis cite Forecast**)  
 15. **Commodity Risk-on/off** (required; `commodity_regime`)  
 16. FX / rates receive (christina; or miss)  
 17. Sources + **Miss ledger** + Footer  
@@ -215,7 +215,7 @@ Copy the block below to `shared/reports/emily/YYYY-MM-DD-commodity-session.md` t
 - …
 - …
 - **commodity_regime:** Risk-on / Neutral / Risk-off / Crisis — …
-- **Alice pull：** Market insight — …
+- **Alice pull:** Market insight — …
 
 ---
 
@@ -238,7 +238,7 @@ Copy the block below to `shared/reports/emily/YYYY-MM-DD-commodity-session.md` t
 
 ---
 
-## World → commodity（3–5 events）
+## World → commodity(3–5 events)
 
 | # | Event | Date | Channel(s) | Mechanism (one sentence) | Grade |
 |---|-------|------|------------|-----------------|-------|
@@ -300,7 +300,7 @@ Copy the block below to `shared/reports/emily/YYYY-MM-DD-commodity-session.md` t
 
 ---
 
-## Commodity puzzle（≥3 blocks）
+## Commodity puzzle(≥3 blocks)
 
 | Block | Supports | Tensions | Missing |
 |-------|----------|----------|---------|
@@ -419,7 +419,7 @@ Copy the block below to `shared/reports/emily/YYYY-Www-commodities-session.md` t
 - …
 - …
 - **commodity_regime:** Risk-on / Neutral / Risk-off / Crisis — …
-- **Alice pull：** Market insight — …
+- **Alice pull:** Market insight — …
 
 ---
 
@@ -442,7 +442,7 @@ Copy the block below to `shared/reports/emily/YYYY-Www-commodities-session.md` t
 
 ---
 
-## World → commodity（fuller）
+## World → commodity(fuller)
 
 | # | Event | Date | Channel(s) | Mechanism (one sentence) | Grade |
 |---|-------|------|------------|-----------------|-------|
@@ -504,7 +504,7 @@ Missing data → cell `miss`, row stays. Or whole table: `cite commodity-forecas
 
 ---
 
-## Commodity puzzle（richer · ≥3 blocks）
+## Commodity puzzle(richer · ≥3 blocks)
 
 | Block | Supports | Tensions | Missing |
 |-------|----------|----------|---------|
@@ -689,7 +689,7 @@ primary levels = US print; proxy-only → Conf≤L + tag `proxy-only`. **No Basi
 ---
 
 ## FX / rates receive (christina · locked)
-- Path: prefer-1 same-session `inbox/rates-session/*-revised.md`；inbox miss / → `shared/reports/christina/…-rates-session.md`；else `miss`（❌ T-1/yesterday shared lock）
+- Path: prefer-1 same-session `inbox/rates-session/*-revised.md`;inbox miss / → `shared/reports/christina/…-rates-session.md`;else `miss`(❌ T-1/yesterday shared lock)
 - Allowed: one paragraph GBPUSD / DXY / DFII **pointer + as-of** explaining US/UK leg divergence / Conf adjustment
 - ❌ this section self-writes FX Est / Obs TP / Rate Δbp / `FX_*` / `B_*`
 

@@ -83,7 +83,7 @@ def _load_tracker(name: str = "portfolio_tracker"):
     return mod
 
 
-def _sgln(pnl: dict) -> dict:
+def _tst1(pnl: dict) -> dict:
     for key in ("TST1.L", "TST1"):
         if key in pnl:
             return pnl[key]
@@ -132,21 +132,21 @@ class TestPortfolioTracker(unittest.TestCase):
         self.pnl = self.mod.compute_pnl(FIXTURE_ROWS, gbp_usd_rate=GBP_USD_RATE)
         self.summary = self.mod.compute_portfolio_summary(self.pnl)
 
-    def test_void_ignored_sgln_remains_open(self):
-        sgln = _sgln(self.pnl)
-        self.assertEqual(int(sgln["sell_shares"]), 68)
-        self.assertEqual(int(sgln["remaining_shares"]), 32)
-        self.assertEqual(sgln["status"], "OPEN")
+    def test_void_ignored_tst1_remains_open(self):
+        tst1 = _tst1(self.pnl)
+        self.assertEqual(int(tst1["sell_shares"]), 68)
+        self.assertEqual(int(tst1["remaining_shares"]), 32)
+        self.assertEqual(tst1["status"], "OPEN")
 
-    def test_sgln_uses_shares_times_price_not_gbp_amount(self):
-        sgln = _sgln(self.pnl)
-        _almost(self, sgln["pnl_gbp"], TST1_PNL_GBP, "pnl_gbp")
-        _almost(self, sgln["buy_gbp"], TST1_BUY_GBP, "buy_gbp")
-        _almost(self, sgln["sell_gbp"], TST1_SELL_GBP, "sell_gbp")
+    def test_tst1_uses_shares_times_price_not_gbp_amount(self):
+        tst1 = _tst1(self.pnl)
+        _almost(self, tst1["pnl_gbp"], TST1_PNL_GBP, "pnl_gbp")
+        _almost(self, tst1["buy_gbp"], TST1_BUY_GBP, "buy_gbp")
+        _almost(self, tst1["sell_gbp"], TST1_SELL_GBP, "sell_gbp")
 
-    def test_sgln_usd_companion_from_gbp_rate(self):
-        sgln = _sgln(self.pnl)
-        _almost(self, sgln["pnl_usd"], TST1_PNL_USD, "pnl_usd")
+    def test_tst1_usd_companion_from_gbp_rate(self):
+        tst1 = _tst1(self.pnl)
+        _almost(self, tst1["pnl_usd"], TST1_PNL_USD, "pnl_usd")
 
     def test_cmcsa_and_ibm_closed_usd(self):
         cmcsa = self.pnl["SYN1"]
@@ -182,7 +182,7 @@ class TestPortfolioTracker(unittest.TestCase):
                 f"{key}={val} looks like two SYN2 SELL GBP Amount cells summed",
             )
 
-    def test_write_report_sgln_line_has_usd_and_gbp(self):
+    def test_write_report_tst1_line_has_usd_and_gbp(self):
         with tempfile.TemporaryDirectory() as td:
             report_dir = Path(td) / "reports"
             report_dir.mkdir()
@@ -190,9 +190,9 @@ class TestPortfolioTracker(unittest.TestCase):
                 self.mod.REPORT_DIR = str(report_dir)
             with patch.dict(os.environ, {"HOME": td}):
                 md = _call_write_report(self.mod, self.pnl, self.summary)
-        sgln_lines = [ln for ln in md.splitlines() if "TST1" in ln]
-        self.assertTrue(sgln_lines, "write_report markdown missing an TST1 position line")
-        pos = next((ln for ln in sgln_lines if "|" in ln), sgln_lines[0])
+        tst1_lines = [ln for ln in md.splitlines() if "TST1" in ln]
+        self.assertTrue(tst1_lines, "write_report markdown missing an TST1 position line")
+        pos = next((ln for ln in tst1_lines if "|" in ln), tst1_lines[0])
         self.assertIn("$", pos)
         self.assertIn("£", pos)
 

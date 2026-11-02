@@ -12,7 +12,7 @@ description: >-
 **Owner:** Alice · **Train:** weekly idea screen / eval funnel  
 **Load with:** catalyst calendar themes, sector relative-strength notes, or ad-hoc screen card.
 
-Mark "Not investment advice".source grading：`📊 Institutional` / `📰 News` / `📊 Data` / `⚠️ Social`。
+Mark "Not investment advice".source grading:`📊 Institutional` / `📰 News` / `📊 Data` / `⚠️ Social`.
 
 ---
 
@@ -49,8 +49,8 @@ Mark "Not investment advice".source grading：`📊 Institutional` / `📰 News`
 
 Prefer:
 
-- Draft: `shared/reports/alice/YYYY-Www-idea-screen-draft.md`（+ workspace OK）
-- After Zoe: `inbox/analysis/YYYY-Www-idea-screen-revised.md`（canonical third layer）
+- Draft: `shared/reports/alice/YYYY-Www-idea-screen-draft.md`(+ workspace OK)
+- After Zoe: `inbox/analysis/YYYY-Www-idea-screen-revised.md`(canonical third layer)
 - Shared copy of revised optional when weekly train expects it
 
 Never resolve `inbox/` under `shared/reports/alice/`.
@@ -90,7 +90,7 @@ Hypothesis, universe, as-of, free sources used.
 
 ## Sources
 - 📊 Data: <Yahoo/FRED/screener> · <date> · <URL or query label>
-- 📰 News / 📊 Institutional: …（if used）
+- 📰 News / 📊 Institutional: …(if used)
 - Misses: <item>: attempted + miss
 
 ## Pending Zoe challenge

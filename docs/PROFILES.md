@@ -18,7 +18,7 @@ Draft → Zoe challenge → owner revises (*revised.md) → inbox / web
 
 **Naming firewall:** profile slug **`emily`** (commodities session) ≠ historical broker **Emily** (M7 execution, **decommissioned 2026-07-17**). Keep slug `emily` — inbox / cron paths depend on it. Broker Emily is historical only; this profile is **not** her successor.
 
-**default vs sarah (ops):** Live cron / gateway home is Hermes **`default`** (`~/.hermes/config.yaml` + `profiles/default/SOUL.md`; **no** per-profile `config.yaml` under `default` — intentional). Profile **`sarah`** is a stopped sibling with shared Telegram risk; editing `sarah/config.yaml` does **not** change live cron. See [`HERMES-CONTROL.md`](HERMES-CONTROL.md) when present on your host.
+**default vs sarah (ops):** On a live Hermes host, cron / gateway home is usually **`default`** (`~/.hermes/config.yaml` + `profiles/default/SOUL.md`; **no** per-profile `config.yaml` under `default` — intentional). A stopped sibling profile named **`sarah`** may exist for orchestration docs; editing a stopped profile's `config.yaml` does **not** change live cron. Host-control runbooks stay on the private ops repo.
 
 **Clone hygiene:** Never leave emily / christina `config.yaml` pointing at Eliza `environment_hint` or another profile's memory DB. Host fix: `scripts/host/patch_clone_config_identity.py` (christina drops memory-store plugin under NO_DB).
 
@@ -32,10 +32,10 @@ Daily SEC cron may be **paused** (job kept). Eliza still owns filings conceptual
 
 Daily T&M: Renee `daily_trend_momentum.py` → Zoe → **Renee** revises (no re-score). Engine/methodology changes wait for Renee's Sunday weekly revise **or** a daily generator card.
 
-Weekly T&M: Renee `weekly_indicator_update` + `verify_weekly_adx` + `weekly_report_gen` (Risk% + ATR14%) → Zoe → **Renee** revise. Do not copy that generator onto the daily job. Details: [`SAT-SUN-FIXES.md`](SAT-SUN-FIXES.md#tm-generators-live-2026-09-06) when present.
+Weekly T&M: Renee `weekly_indicator_update` + `verify_weekly_adx` + `weekly_report_gen` (Risk% + ATR14%) → Zoe → **Renee** revise. Do not copy that generator onto the daily job.
 
 Tracker job checks that a same-date `*revised.md` exists. Script pool: [`../scripts/host/`](../scripts/host/).
 
 Routine social snapshots (`social-watch/*-snapshot.md`) are a monitoring feed, not formal portal reports — no Zoe gate. Alice owns depth scan there (tier-1 social leaders + capped forums). Market-close / desk overall is **cite-only** for social — do not re-crawl. The close wrap also carries Alice **financial news analysis** (ledger + themes / bull-bear), **news vs social comments**, and **inline Sources**; template skill: `profiles/alice/skills/market-close-news-social`. Inbox path `daily-social/` is the **market-close companion** deliverable (coverage SSOT), **not** the social-watch snapshot.
 
-Cron jobs start on the **clock**. Inside one report, Kanban `parents=` runs the next card after the previous finishes. Sat/Sun applied patches: [`SAT-SUN-FIXES.md`](SAT-SUN-FIXES.md). Web: reports portal on the Hermes host (`/reports/`).
+Cron jobs start on the **clock**. Inside one report, Kanban `parents=` runs the next card after the previous finishes. Sat/Sun host patches stay in the private ops repo. Web: reports portal on the Hermes host (`/reports/`).

@@ -66,7 +66,7 @@ Shock type → Channel enum → Dual-leg impact → bull|base|bear mechanism poi
 | **1. Shock type** | e.g. supply outage/demand spike/policy ban/weather crop/risk-premium geo | One sentence; needs outlet + date |
 | **2. Channel enum** | Only allowed: `supply` · `demand` · `risk-premium` · `USD` · `real-yield` · `weather` · `policy` · `other` | Custom strings → FAIL |
 | **3. Dual-leg impact** | Ten-column US + UK/EU: `↑`/`↓`/`flat`/`N/A`/`miss` + half sentence | Skip column not allowed; proxy≠futures≠LSE |
-| **4. bull｜base｜bear pointer** | Hand off one **mechanism bias** sentence to `commodity-forecast` (do not finalize Est/`C_*` in this skill) | Qualitative; ❌ fake precise Q |
+| **4. bull|base|bear pointer** | Hand off one **mechanism bias** sentence to `commodity-forecast` (do not finalize Est/`C_*` in this skill) | Qualitative; ❌ fake precise Q |
 
 **❌ Linear fake Q/equilibrium invent (hard):**  
 Do not use synthetic supply/demand curves, fake mbbl/fake output Δ%, fake "equilibrium price = a−bQ" fill numbers. No official source → that shock numbers cell **`miss`**; write only channel + dual-leg direction narrative.
@@ -199,7 +199,7 @@ Direction short tags: `↑`/`↓`/`flat`/`N/A`/`miss` + half-sentence reason; no
 - [ ] Per event: mechanism sentence + ≥1 **enumerated channel**  
 - [ ] Per event ten-column dual-leg matrix complete (`N/A`/`miss` OK; skip column not allowed)  
 - [ ] Channels only: `supply`/`demand`/`risk-premium`/`USD`/`real-yield`/`weather`/`policy`/`other`  
-- [ ] **Shock skeleton** (when present): Shock type → channel → dual-leg → bull｜base｜bear pointer; ❌ fake Q/equilibrium invent  
+- [ ] **Shock skeleton** (when present): Shock type → channel → dual-leg → bull|base|bear pointer; ❌ fake Q/equilibrium invent  
 - [ ] Calendar: EIA/WASDE/Export Sales/COT/softs official windows; unknown → `miss`; ❌ FMP invent dates  
 - [ ] No headlines-only; no this-section Risk-on/off  
 - [ ] Ticker SSOT; proxy≠futures≠LSE; no `XAG-USD`  

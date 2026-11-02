@@ -60,11 +60,11 @@ ISO week: `date -u +%G-W%V`( 2026-W38).
 1) kanban_create(christina). Mode=weekly depth. 
 2) Load skills: curve-watch -> real-rates -> fedwatch-consume -> bond-etf-tape -> fx-us-uk-bridge -> rates-session-report(trunk). 
 3) FedWatch: CONSUME-ONLY cron fedwatch-daily. Prefer `~/.hermes/shared/reports/alice/fedwatch/latest.json` then same-day `YYYY-MM-DD-fedwatch.json`. Cite-or-miss. ❌ hermes cron-run · ❌ invent probs. 
-4) Pre-publish: DQ(Ccy/proxy≠cash/FX polarity/as-of)+ calendar fail-closed(miss ≠「」)+ Est-after-FX(bond Est/Obs FX handoff). 
+4) Pre-publish: DQ(Ccy/proxy≠cash/FX polarity/as-of)+ calendar fail-closed(miss ≠'')+ Est-after-FX(bond Est/Obs FX handoff). 
 5) Draft: shared/reports/christina/YYYY-Www-rates-session.md. 
 6) REQUIRED after Header: ## Session summary(5–8 bullets; rates_regime; Alice pull -> Market insight). rates_regime ≠ desk Risk-on/off. 
 6b) REQUIRED: ## Market insight(; ❌ desk Risk-on/off ). 
-7) Weekly: Gov＋Other Est/Obs( miss ); FX (low–high miss); DXY＋EURUSD＋GBPUSD＋USDJPY ; Obs FX_LONG/FX_SHORT(❌ HOLD TP); Session summary FX bullet; News/Market 2–3; Lenses + Dominant; Miss ledger. 
+7) Weekly: Gov+Other Est/Obs( miss ); FX (low–high miss); DXY+EURUSD+GBPUSD+USDJPY ; Obs FX_LONG/FX_SHORT(❌ HOLD TP); Session summary FX bullet; News/Market 2–3; Lenses + Dominant; Miss ledger. 
 8) Zoe IC -> **christina** revise(owner only). B_*/FX_*. ❌ bare BUY/tm_score · ❌ C_*↔B_*↔FX_*. 
 {MERCURY_DECIDE_ZOE_HOOK}
 9) 3-layer final: workspace + shared + {INBOX_ROOT}/rates-session/YYYY-Www-rates-session-revised.md. ❌ `inbox/YYYY-Www-rates-session-revised.md`(inbox root). 
@@ -81,7 +81,7 @@ ISO week: `date -u +%G-W%V`( 2026-W38).
 3) Draft: shared/reports/emily/YYYY-Www-commodities-session.md. 
 4) REQUIRED after Header: ## Session summary(5–8 bullets + commodity_regime; Alice pull -> Market insight). commodity_regime ≠ desk Risk-on/off. 
 4b) REQUIRED: ## Market insight(cite commodity-insight; ❌ desk Risk-on/off ). 
-5) Weekly: News/Market check( Scenario/levels ): 2–3 Emily-topic + calendar(URL ≤12) `News: miss`; Lenses stub + Dominant(Macro/Micro/Market); Insight; Direction DIR_* ; Forecast Scenario±Est ****; History 1M/3M/1Y cite Forecast bull/base/bear(History ); Trade map C_* ; Basis cite Forecast+history finalize + Dominant tag(macro-led|micro-led|market-led|mixed); Obs levels; ; ≥3. Obs Obs TP cite Est band ; Est value band miss; ❌ History/trunk Scenario. Basis lean: base|bull|bear|two-way; DIR_* Conf↓ C_WAIT; Forecast. TP cite Est band -> levels miss C_WAIT/NO_SETUP. ＋Oil fuel footnotes(Soy/Wheat/Corn/Oil)cite-or-miss, miss. 
+5) Weekly: News/Market check( Scenario/levels ): 2–3 Emily-topic + calendar(URL ≤12) `News: miss`; Lenses stub + Dominant(Macro/Micro/Market); Insight; Direction DIR_* ; Forecast Scenario±Est ****; History 1M/3M/1Y cite Forecast bull/base/bear(History ); Trade map C_* ; Basis cite Forecast+history finalize + Dominant tag(macro-led|micro-led|market-led|mixed); Obs levels; ; ≥3. Obs Obs TP cite Est band ; Est value band miss; ❌ History/trunk Scenario. Basis lean: base|bull|bear|two-way; DIR_* Conf↓ C_WAIT; Forecast. TP cite Est band -> levels miss C_WAIT/NO_SETUP. +Oil fuel footnotes(Soy/Wheat/Corn/Oil)cite-or-miss, miss. 
 6) ❌ C_* Direction · ❌ DIR_* Signal · ❌ bare BUY · ❌ invent inventory/ARIMA Scenario. 
 7) FX/rates: Car 1 rates -> cite Car1/ FX/rates; Car 1 miss -> miss OK. ❌ FX Est/B_*/Rate Δbp. 
 8) Zoe -> **emily** revise(owner only). ❌ C_*↔B_*↔FX_* · ❌ bare BUY/tm_score. 
@@ -98,7 +98,7 @@ ISO week: `date -u +%G-W%V`. Sarah only kanban_create — analysis.
 ## Car 1 — christina weekly rates
 {RATES_WEEKLY.strip()}
 
-Soft-wait `rates-session` at `{INBOX_ROOT}/rates-session/YYYY-Www-*-revised.md` **or** write miss/attempted. ❌ `~/.hermes/shared/inbox/` · ❌ `shared/reports/*/inbox/`. Then Car 2. Width＝Car 4, Alice＝Car 5. 
+Soft-wait `rates-session` at `{INBOX_ROOT}/rates-session/YYYY-Www-*-revised.md` **or** write miss/attempted. ❌ `~/.hermes/shared/inbox/` · ❌ `shared/reports/*/inbox/`. Then Car 2. Width=Car 4, Alice=Car 5. 
 
 ## Car 2 — emily weekly commodities
 {COMMODITIES_WEEKLY.strip()}
@@ -125,9 +125,9 @@ Sarah only kanban_create — analysis.
 
 1. kanban_create(eliza, goal_mode=True) valuation width scan: 
  - valuation_width_scan.py: Tier 1 width / Tier 2 quality overlay / Tier 3 value trap
-   - MUST run BOTH tracks A+B(default both-tracks / omit `--track`). ❌ `--track A` / `--track B` partial runs(W40 RCA: partial A-only -> false 「Track B 0 hits」). Live runner: `~/.hermes/profiles/eliza/scripts/valuation/valuation_width_scan.py`
+   - MUST run BOTH tracks A+B(default both-tracks / omit `--track`). ❌ `--track A` / `--track B` partial runs(W40 RCA: partial A-only -> false 'Track B 0 hits'). Live runner: `~/.hermes/profiles/eliza/scripts/valuation/valuation_width_scan.py`
  - published passer `valuation_score`(0–100, five-factor only)+ `width_verdict`. ❌ `tm_score`
- - published selected row markdown Spot(as_of)、FV Range、Upside %( band, scan JSON/revise overlay, runner ). JSON `$fv_range` `+%` , FV `?`. -> Omissions `attempted + miss`. ❌ FV. ❌ full DCF. 
+ - published selected row markdown Spot(as_of),FV Range,Upside %( band, scan JSON/revise overlay, runner ). JSON `$fv_range` `+%` , FV `?`. -> Omissions `attempted + miss`. ❌ FV. ❌ full DCF. 
  - runner `composite_score`: revise `valuation_composite`, ×100 -> `valuation_score`; `adjusted_composite` -> 0–100 `quality_adjusted_score`
  - `valuation_score` ticker passer, Omissions
  - E5: T&M overlap -> WARN, width JSON `e5_overlap`. value T&M 
@@ -166,7 +166,7 @@ Revised : ${{DATE_UTC}}-W${{WK}}-weekly-deep-dive-revised.md
  GICS 11 crash-indicator( cite, miss) Macro view , `##`. 
    E5 WARN only. ❌ blend `tm_score`/`valuation_score`/`B_*`/`FX_*`/`C_*`. 
  `tm_score` ≥90 : renee Four Session summaries, `miss`. ❌ `§3.3`. GC=F daily cache canonical. UNH valuation+weekly BUY aligned WATCH. 
- Draft (header 「 Zoe 」): alice workspace + shared/reports/alice/weekly-deep-dive/. ❌ portal. 
+ Draft (header ' Zoe '): alice workspace + shared/reports/alice/weekly-deep-dive/. ❌ portal. 
 3) Zoe challenge(parents=[alice draft]). Zoe *revised.md. 
 {MERCURY_DECIDE_ZOE_HOOK}
 4) Alice revise: workspace + shared + ➡️ {INBOX_ROOT}/weekly-deep-dive/${{DATE_UTC}}-W${{WK}}-weekly-deep-dive-revised.md. 

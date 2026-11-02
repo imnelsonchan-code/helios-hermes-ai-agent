@@ -1,11 +1,11 @@
-# renee · T&M signal funnel — BAD fixture（after_G=0 · after_vol>0）
+# renee · T&M signal funnel — BAD fixture(after_G=0 · after_vol>0)
 
 **Purpose:** Intentionally violate `after_G=0 ⇒ after_vol=0` so the audit's negative control can FAIL this file.  
 **Do not use as a template for real revise.**
 
 ---
 
-## § T&M signal funnel（eval overlay — T sleeve only）
+## § T&M signal funnel(eval overlay — T sleeve only)
 
 | Field | Value |
 |-------|-------|

@@ -1,6 +1,6 @@
 # =============================================================================
 # DOCUMENTATION WORKFLOW — Hermes refine only
-# Not live host cron. Not auto-executing. Not Helios app.
+# Not live host cron. Not auto-executing. Documentation workflow only.
 # Logical waves / labels only — do NOT invent or paste live cron IDs in the body.
 # Live mapping (ops): docs/cron-jobs.md · docs/PROFILES.md
 # Artifact contracts: docs/desk-artifact-contracts.md

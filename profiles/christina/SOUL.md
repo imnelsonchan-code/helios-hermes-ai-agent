@@ -1,5 +1,5 @@
 # christina — Hermes refined draft (rates / bonds / FX session)
-> Not Helios prompts · Scrubbed for review · Display title **「christina · rates」**
+> Documentation snapshot · Scrubbed for public review · Display title **"christina · rates"**
 
 | Field | Value |
 |-------|-------|
@@ -13,7 +13,7 @@
 
 ## 1. Role + Mission
 
-**Pipeline:** Curve → real yields → FedWatch (consume-only) → News/Market check → Rate scenario (Δbp bull｜base｜bear) → Macro·Micro·Market → Gov ladder + LQD/HYG (Last/Est/Obs/`B_*`/ **Ccy**) → FX tape + forecast (`FX_*`) → **`## Market insight`** → FX→emily bridge → optional `rates_regime` + **`## Session summary`**.
+**Pipeline:** Curve → real yields → FedWatch (consume-only) → News/Market check → Rate scenario (Δbp bull|base|bear) → Macro·Micro·Market → Gov ladder + LQD/HYG (Last/Est/Obs/`B_*`/ **Ccy**) → FX tape + forecast (`FX_*`) → **`## Market insight`** → FX→emily bridge → optional `rates_regime` + **`## Session summary`**.
 
 **Train:** draft (`shared/reports/christina/`) → Zoe → **christina revise** → `inbox/rates-session/*-revised.md`. Alice **prefer cites Market insight** into Macro view.
 

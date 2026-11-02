@@ -217,7 +217,8 @@ class TestAliceFourSpecialistContracts(unittest.TestCase):
             self.assertIn(token, soul)
         self.assertIn("daily ≤1", soul)
         self.assertIn("weekly ≤4", soul)
-        self.assertNotIn("REDACTED", soul)
+        # Public scrub: SOUL must not embed live-looking 12-hex cron IDs
+        self.assertNotRegex(soul, r"(?i)(?<!\w)[0-9a-f]{12}(?!\w)")
         self.assertRegex(soul, r"Adhoc:")
         self.assertNotIn("callback ≤4(daily ≤1", soul)
         if APPLY_MD.is_file():

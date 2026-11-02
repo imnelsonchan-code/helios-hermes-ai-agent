@@ -131,14 +131,14 @@ class PositionWatchTests(unittest.TestCase):
         return {p.ticker: p for p in self.positions}
 
     def test_tst1_remaining_32_void_ignored(self):
-        sgln = self._by_ticker()["TST1.L"]
-        self.assertEqual(sgln.remaining, 32)
-        self.assertTrue(sgln.ack)
-        self.assertTrue(sgln.kelly_override)
-        self.assertTrue(sgln.etf)
-        self.assertEqual(sgln.sl, 61.0)
-        self.assertEqual(sgln.tp1, 63.0)
-        self.assertEqual(sgln.tp2, 64.0)
+        tst1 = self._by_ticker()["TST1.L"]
+        self.assertEqual(tst1.remaining, 32)
+        self.assertTrue(tst1.ack)
+        self.assertTrue(tst1.kelly_override)
+        self.assertTrue(tst1.etf)
+        self.assertEqual(tst1.sl, 61.0)
+        self.assertEqual(tst1.tp1, 63.0)
+        self.assertEqual(tst1.tp2, 64.0)
 
     def test_acme_beta_remaining(self):
         by = self._by_ticker()
@@ -150,7 +150,7 @@ class PositionWatchTests(unittest.TestCase):
         self.assertIsNone(empty.sl)
         self.assertEqual(empty.tp1, 22.0)
 
-    def test_join_tm_unh_last_and_score_googl_na_sgln_na(self):
+    def test_join_tm_unh_last_and_score_googl_na_tst1_na(self):
         positions = self.mod.compute_open_positions(self.rows, gbp_usd_rate=1.31)
         self.mod.join_tm(positions, {"BETA": {"tm_score": 58.4, "last": 400.84}})
         by = {p.ticker: p for p in positions}
@@ -164,9 +164,9 @@ class PositionWatchTests(unittest.TestCase):
     def test_tst1_strips_tm_even_if_present(self):
         positions = self.mod.compute_open_positions(self.rows, gbp_usd_rate=1.31)
         self.mod.join_tm(positions, {"TST1.L": {"tm_score": 80, "last": 62.0}})
-        sgln = {p.ticker: p for p in positions}["TST1.L"]
-        self.assertIsNone(sgln.tm_score)
-        self.assertIsNone(sgln.last)
+        tst1 = {p.ticker: p for p in positions}["TST1.L"]
+        self.assertIsNone(tst1.tm_score)
+        self.assertIsNone(tst1.last)
 
     def test_daily_score_maps_to_tm_score_column(self):
         with tempfile.TemporaryDirectory() as td:
@@ -211,10 +211,10 @@ class PositionWatchTests(unittest.TestCase):
 
         positions = self.mod.compute_open_positions(self.rows, gbp_usd_rate=1.31)
         by = {p.ticker: p for p in positions}
-        sgln = by["TST1.L"]
+        tst1 = by["TST1.L"]
         # MFE_close < 1R required for time-stop; latch path must be writable.
-        sgln.risk_per_share = 2.0
-        sgln.market_bars = (
+        tst1.risk_per_share = 2.0
+        tst1.market_bars = (
             DailyBar(
                 session=date(2026, 8, 5),
                 open=Decimal("60.08"),
@@ -229,9 +229,9 @@ class PositionWatchTests(unittest.TestCase):
             flags = self.mod.build_flags(
                 positions, self.session, [], time_stop_latch_path=latch
             )
-        sgln_exit = [f for f in flags if f.kind == "exit" and "TST1.L" in f.text]
-        self.assertTrue(sgln_exit)
-        self.assertTrue(all(not f.telegram for f in sgln_exit))
+        tst1_exit = [f for f in flags if f.kind == "exit" and "TST1.L" in f.text]
+        self.assertTrue(tst1_exit)
+        self.assertTrue(all(not f.telegram for f in tst1_exit))
         tel = self.mod.telegram_lines(flags)
         kelly = [f for f in flags if f.kind == "Kelly"]
         ack = [f for f in flags if f.kind == "ACK"]
@@ -248,9 +248,9 @@ class PositionWatchTests(unittest.TestCase):
         from market_data import DailyBar
 
         positions = self.mod.compute_open_positions(self.rows, gbp_usd_rate=1.31)
-        sgln = next(p for p in positions if p.ticker == "TST1.L")
-        sgln.risk_per_share = 1.0
-        sgln.market_bars = (
+        tst1 = next(p for p in positions if p.ticker == "TST1.L")
+        tst1.risk_per_share = 1.0
+        tst1.market_bars = (
             DailyBar(
                 session=date(2026, 8, 5),
                 open=Decimal("60.08"),
@@ -265,18 +265,18 @@ class PositionWatchTests(unittest.TestCase):
             flags = self.mod.build_flags(
                 positions, self.session, [], time_stop_latch_path=latch
             )
-        sgln_time = [
+        tst1_time = [
             f
             for f in flags
             if f.kind == "exit" and "TST1.L" in f.text and "10-day" in f.text
         ]
-        self.assertEqual(sgln_time, [])
+        self.assertEqual(tst1_time, [])
 
     def test_tst1_kelly_override_skips_kelly(self):
         positions = self.mod.compute_open_positions(self.rows, gbp_usd_rate=1.31)
         flags = self.mod.build_flags(positions, self.session, [])
-        kelly_sgln = [f for f in flags if f.kind == "Kelly" and "TST1" in f.text]
-        self.assertEqual(kelly_sgln, [])
+        kelly_tst1 = [f for f in flags if f.kind == "Kelly" and "TST1" in f.text]
+        self.assertEqual(kelly_tst1, [])
 
     def test_empty_book_copy(self):
         audit = self.mod.build_final_audit([], [], "missing", {})
@@ -383,17 +383,17 @@ class PositionWatchTests(unittest.TestCase):
         positions = self.mod.compute_open_positions(self.rows, gbp_usd_rate=1.31)
         md = self.mod.render_markdown(self.session, positions, [], "missing")
         googl = next(ln for ln in md.splitlines() if ln.startswith("| ACME |"))
-        sgln = next(ln for ln in md.splitlines() if ln.startswith("| TST1.L |"))
+        tst1 = next(ln for ln in md.splitlines() if ln.startswith("| TST1.L |"))
         self.assertIn("$336.32", googl)
         self.assertIn("$330.00", googl)
         self.assertIn("$351.00", googl)
         self.assertIn("$373.00", googl)
         self.assertNotIn("£", googl)
-        self.assertIn("£60.08", sgln)
-        self.assertIn("£61.00", sgln)
-        self.assertIn("£63.00", sgln)
-        self.assertIn("£64.00", sgln)
-        self.assertNotIn("$", sgln)
+        self.assertIn("£60.08", tst1)
+        self.assertIn("£61.00", tst1)
+        self.assertIn("£63.00", tst1)
+        self.assertIn("£64.00", tst1)
+        self.assertNotIn("$", tst1)
 
     def test_live_usd_fill_not_gbp_price(self):
         by = self._by_ticker()

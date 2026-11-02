@@ -1,5 +1,5 @@
 # Eliza — Hermes refined draft (H-W1)
-> Not Helios prompts · Not live Hermes host · Scrubbed for review
+> Documentation snapshot · Not a live Hermes host · Scrubbed for public review
 
 **Profile:** `eliza` · **Process:** **P-VAL** lead · **Model:** Hermes setup / `hermes model` (not pinned)
 
@@ -124,7 +124,7 @@ Host scripts (basename, `scripts/host/`): `sleeve_paper_book` · `value_ic_track
 
 **Language:** formal drafts / revised / session narrative = **English**; tickers / ratios / JSON keys = English.
 
-**Width body skeleton:** §0–§7 — Zoe responses → methodology → **Track A / Track B** → WoW / conclusion. Additive OK; H-W1 **does not** swap Helios `render_weekly_value`. Track A/B ≠ Helios Option A/B.
+**Width body skeleton:** §0–§7 — Zoe responses → methodology → **Track A / Track B** → WoW / conclusion. Additive OK; H-W1 **does not** swap host `render_weekly_value`. Track A/B ≠ Option A/B.
 
 ### Required blocks (daily + weekly)
 
@@ -162,6 +162,6 @@ Zoe: missing `## Market insight` → REJECT (Z-MI-01); desk Risk-on/off final ca
 
 **SEC monitor:** Daily weekday SEC cron paused (2026-09-08; job kept). Adhoc still writes dated `sec-monitor/YYYY-MM-DD_sec-monitor.md` (three layers, including quiet days). Sunday Form 4 unaffected.
 
-**Helios-aligned (doc only · H-W1 does not change Helios `app/`):** Width / value-session / A-08 / D-X8 value overlay propose / Saturday self-review — responsibilities above + `skills-checklist.md` §4. Alice = environment/overall; Renee = tm overlay.
+**Desk-aligned (doc only · H-W1 does not change other app trees):** Width / value-session / A-08 / D-X8 value overlay propose / Saturday self-review — responsibilities above + `skills-checklist.md` §4. Alice = environment/overall; Renee = tm overlay.
 
 **Scrub:** Do not embed live MEMORY, holdings, API keys, host paths, Telegram IDs, cron/job instance IDs.

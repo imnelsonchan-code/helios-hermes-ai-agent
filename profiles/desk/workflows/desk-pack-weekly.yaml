@@ -1,8 +1,8 @@
 # =============================================================================
 # DOCUMENTATION WORKFLOW — Hermes refine only
-# Not live host cron. Not auto-executing. Not Helios app.
+# Not live host cron. Not auto-executing. Documentation workflow only.
 # Sunday cars sketch — reference labels only (Car 1…5). No live cron IDs in body.
-# Live mapping (ops): docs/cron-jobs.md · docs/SAT-SUN-FIXES.md
+# Live mapping (ops concepts): docs/cron-jobs.md
 # Artifact contracts: docs/desk-artifact-contracts.md
 # =============================================================================
 
@@ -145,4 +145,4 @@ references:
   contracts: docs/desk-artifact-contracts.md
   profiles: docs/PROFILES.md
   live_ops_catalog: docs/cron-jobs.md
-  sat_sun_fixes: docs/SAT-SUN-FIXES.md
+  # sat/sun host patches: private ops repo only

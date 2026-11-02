@@ -1,4 +1,4 @@
-# renee · T&M signal funnel — hygiene fixture（GOOD · monotonic）
+# renee · T&M signal funnel — hygiene fixture(GOOD · monotonic)
 
 **Purpose:** Lightweight template for scoring *funnel cite hygiene* with monotonic counts.  
 **Not:** invent counts · rewrite `tm_score` · Book V.  
@@ -8,18 +8,18 @@
 
 ## Meta
 - **as_of:** 2026-09-22
-- **Source:** scoring-eval/2026-09-22-daily-eval.json（fixture）
+- **Source:** scoring-eval/2026-09-22-daily-eval.json(fixture)
 - **Disclaimer:** Not investment advice · hygiene only · demotions informational
 
 ---
 
 ## Session summary
-- Funnel section below cites daily-eval only；ranking stays live pack elsewhere.
-- Null-ADX path not used（ADX present）.
+- Funnel section below cites daily-eval only;ranking stays live pack elsewhere.
+- Null-ADX path not used(ADX present).
 
 ---
 
-## § T&M signal funnel（eval overlay — T sleeve only）
+## § T&M signal funnel(eval overlay — T sleeve only)
 
 | Field | Value |
 |-------|-------|
@@ -28,7 +28,7 @@
 | Theoretical BUY (`buys_theoretical`) | 5 |
 | After Option G (`buys_after_option_g`) | 5 |
 | After volume gate (`buys_after_volume_gate`) | 3 |
-| `volume_demotions[]` | 2 names（informational；`tm_score` unchanged） |
+| `volume_demotions[]` | 2 names(informational;`tm_score` unchanged) |
 
 Monotonic check: **5 ≥ 5 ≥ 3** ✓
 
@@ -40,7 +40,7 @@ Monotonic check: **5 ≥ 5 ≥ 3** ✓
 
 ---
 
-## Hygiene scorecard（what the harness asserts）
+## Hygiene scorecard(what the harness asserts)
 
 | Rule | Expected |
 |------|----------|

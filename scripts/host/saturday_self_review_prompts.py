@@ -468,13 +468,13 @@ def prompt_complete(prompt: str) -> bool:
         return False
     if "6 serial" not in p and STEP1_HEAD not in p:
         return False
- if "one-by-one" not in p and "" not in p:
+    if "one-by-one" not in p:
         return False
     if "0 12 * * 6" not in JOB_SCHEDULE:
         return False
     if "12:00 UTC" not in p:
         return False
- if "" in p or "6 parallel" in p.lower():
+    if "6 parallel" in p.lower():
         return False
     for name in SERIAL_ASSIGNEES:
         if f'assignee="{name}"' not in p:

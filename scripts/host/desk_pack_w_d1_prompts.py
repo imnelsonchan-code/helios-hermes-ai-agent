@@ -36,7 +36,7 @@ Not investment advice · observation only. Display "emily · commodities"(≠ br
 3) Draft: shared/reports/emily/YYYY-MM-DD-commodity-session.md( commodities-session ). 
 4) REQUIRED after Header: ## Session summary(5–8 bullets + commodity_regime; Alice pull -> Market insight). commodity_regime ≠ desk Risk-on/off. 
 4b) REQUIRED: ## Market insight(cite commodity-insight; ❌ desk Risk-on/off ). 
-5) Cite slots: Insight · Direction(DIR_*)· Forecast( · 1–4w · bull｜base｜bear ± Est band; miss, ; skip). News/Market check( Scenario/levels ): ≥1 Emily-topic `News: miss`. Lenses(Macro＋Micro; Market ; Dominant). 
+5) Cite slots: Insight · Direction(DIR_*)· Forecast( · 1–4w · bull|base|bear ± Est band; miss, ; skip). News/Market check( Scenario/levels ): ≥1 Emily-topic `News: miss`. Lenses(Macro+Micro; Market ; Dominant). 
 6) Daily: + Trade map C_*; Obs ≤3 Obs entry/cut/TP, Obs TP cite Est band ; levels -> Basis cite Forecast + Dominant tag(macro-led|micro-led|market-led|mixed); Forecast/Est cite -> Obs levels. levels Basis lean: base|bull|bear|two-way. 3–5; ≥3 . 
 7) ❌ C_* Direction · ❌ DIR_* Signal · ❌ bare BUY · ❌ invent inventory/ARIMA Scenario. 
 8) FX/rates: prefer cite Wave1/christina rates session miss — ❌ FX Est/B_*/Rate Δbp. 
@@ -49,7 +49,7 @@ VALUE_DAILY = f"""You are Sarah — Hermes desk operator. Desk Pack W-D1 Wave2 �
 Not investment advice. P-VAL only — ❌ tm_score/T&M brackets. 
 
 1) kanban_create(eliza). Desk pack #4 value-session. 
-2) value-sleeve data snapshot + movers vs Sunday lock. Sunday valuation_score; ; reshuffle weekly value-100. Movers : Today spot / %、Sunday lock FV( revised JSON `fv_range` )、Display upside %(= FV / spot − 1). FV spot -> `attempted + miss`. ❌ FV. ❌ upside `valuation_score`/`width_verdict`/. 
+2) value-sleeve data snapshot + movers vs Sunday lock. Sunday valuation_score; ; reshuffle weekly value-100. Movers : Today spot / %,Sunday lock FV( revised JSON `fv_range` ),Display upside %(= FV / spot − 1). FV spot -> `attempted + miss`. ❌ FV. ❌ upside `valuation_score`/`width_verdict`/. 
 3) REQUIRED after Header: ## Session summary(5–8 bullets + valuation stance; Alice pull -> Market insight). 
 3b) REQUIRED: ## Market insight + News/Market + Lenses(valuation domain; ❌ desk Risk-on/off/tm_score). 
 4) Zoe -> **eliza** revise(owner only)— ❌ do not hand off to Alice value revise. 

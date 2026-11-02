@@ -12,7 +12,7 @@ description: >-
 **Owner:** Alice · **Train:** thesis registry / Saturday self-review  
 **Load with:** idea-generation handoff, weekly integrate, or Saturday drift pass.
 
-Mark "Not investment advice".source grading：`📊 Institutional` / `📰 News` / `📊 Data` / `⚠️ Social`。
+Mark "Not investment advice".source grading:`📊 Institutional` / `📰 News` / `📊 Data` / `⚠️ Social`.
 
 ---
 
@@ -46,7 +46,7 @@ shared/reports/alice/theses/TICKER.md
 One file per ticker. Create on first thesis; append evidence log; never delete history (strike + date if retired). Registry alone is **not** a portal Jobs deliverable.
 
 **Formal claim publish** (material pillar/invalidation change meant for inbox/www): also emit  
-`inbox/analysis/YYYY-MM-DD-<TICKER>-thesis-update-revised.md` after Zoe（3-layer；cite the living `theses/TICKER.md`）.
+`inbox/analysis/YYYY-MM-DD-<TICKER>-thesis-update-revised.md` after Zoe(3-layer;cite the living `theses/TICKER.md`).
 
 Optional Saturday drift note:
 

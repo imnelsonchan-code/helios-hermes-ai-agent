@@ -1,4 +1,4 @@
-# christina · rates — Obs backtest BAD fixture（negative control · must FAIL）
+# christina · rates — Obs backtest BAD fixture(negative control · must FAIL)
 
 **Purpose:** Intentional hygiene violations so the harness negative-control check passes.  
 **Not** a real session. Do not copy into production drafts.
@@ -13,7 +13,7 @@
 
 ---
 
-## Gov bond ETF view（violations on purpose）
+## Gov bond ETF view(violations on purpose)
 
 | Bucket | ETF | Venue | Ccy | Last | Est | Obs entry | Obs cut | Obs TP | Signal | Horizon | Basis | Conf |
 |--------|-----|-------|-----|------|-----|-----------|---------|--------|--------|---------|-------|------|
@@ -22,7 +22,7 @@
 
 ---
 
-## Next-day prints（fixture · fake）
+## Next-day prints(fixture · fake)
 
 | Symbol | US print | Note |
 |--------|----------|------|

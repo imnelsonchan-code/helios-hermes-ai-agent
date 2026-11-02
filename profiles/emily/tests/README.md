@@ -33,7 +33,7 @@ Exit `0` = all checks pass · non-zero = fail (CI-friendly).
 | 2 | **Namespace isolation** | `DIR_*` not used as **Signal** values in Trade map examples; bare `BUY` banned; checklist documents isolation |
 | 3 | **Scaffold completeness** | Daily + Weekly blank templates in `commodity-session-report` each have Insight / Direction / Forecast **cite** slots |
 | 4 | **Obs backtest hygiene** | Scores `obs_backtest_fixture.md` (fake prior session + next-day prints) on hygiene rules only — **no PnL**. Negative control: `fixtures/obs_backtest_bad.md` must exhibit violations |
-| 5 | **ADAPT patch gates** | Static keywords: post-crawl QA / `data_delay` · term+CY+COT · shock/calendar/FMP · anti-ARIMA Method A · shadow breakdown · obs-backtest Eval/Sat (not in Keep load) · apply-to-hermes skill list · P1 Later stubs present (not in Keep) |
+| 5 | **ADAPT patch gates** | Static keywords: post-crawl QA / `data_delay` · term+CY+COT · shock/calendar/FMP · anti-ARIMA Method A · shadow breakdown · obs-backtest Eval/Sat (not in Keep load) · host apply skill list (skipped if absent) · P1 Later stubs present (not in Keep) |
 | 6 | **Desk-pack prompts** | `check_desk_pack_prompts.sh` — fails if emily load still `sources→signal→world…`; requires canonical 8-skill chain |
 
 ---
@@ -45,7 +45,7 @@ profiles/emily/tests/
  README.md ← this file
  run_emily_audit.sh ← runner (exit nonzero on fail)
  check_desk_pack_prompts.sh ← desk-pack load-order gate
- smoke_live_checklist.md ← hermes-ctl adhoc daily-lite smoke (observation-only)
+ smoke_live_checklist.md ← host adhoc daily-lite smoke (observation-only; private CLI)
  obs_backtest_fixture.md ← good fixture (hygiene PASS)
  fixtures/
  obs_backtest_bad.md ← bad fixture (negative control)
@@ -53,7 +53,7 @@ profiles/emily/tests/
 
 ### Live smoke (optional · needs Hermes host)
 
-See [`smoke_live_checklist.md`](smoke_live_checklist.md) — `hermes-ctl` steps; no secrets. Static checks first; SSH only when you choose live smoke.
+See [`smoke_live_checklist.md`](smoke_live_checklist.md) — conceptual host smoke; no secrets. Static checks first; live SSH only when you choose.
 
 ---
 

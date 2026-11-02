@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-four_path_auto_derive_gate.py — W43 Four-path Auto-Derive Gate（）
+four_path_auto_derive_gate.py — W43 Four-path Auto-Derive Gate()
 
 Desk train default is NO ``--patch`` (check only). ``--patch`` replaces one
 existing Header block and must not append a second copy.
@@ -339,14 +339,14 @@ def format_four_path_bullets(result: Dict[str, Any]) -> str:
         owner = _LAYOUT[session_key]["owner"]
         emoji = verdict_emoji.get(verdict, "⚪")
         if status == "ok":
-            note = f"（Zoe {emoji} {verdict}， re-challenge）"
+            note = f"(Zoe {emoji} {verdict}, re-challenge)"
         elif status == "pending-rechallenge":
-            note = f"（Zoe {emoji} {verdict}，revised exists， re-challenge）"
+            note = f"(Zoe {emoji} {verdict},revised exists, re-challenge)"
         elif repr_path is not None:
  # Revised file is on disk — never describe that leg as .
-            note = f"（Zoe {emoji} {verdict}，revised exists， re-challenge）"
+            note = f"(Zoe {emoji} {verdict},revised exists, re-challenge)"
         else:
-            note = "（revised repr ）"
+            note = "(revised repr )"
         lines.append(
             f"  - {session_key} ({owner}): `{filename}` → **{status}**{note}"
         )
@@ -522,7 +522,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             _emit(
                 payload,
                 args.json,
-                f"❌ Four-path gate FAIL（patch ） — {date_str}\n{detail}",
+                f"❌ Four-path gate FAIL(patch ) — {date_str}\n{detail}",
             )
             return 1
         report_path.write_text(new_text, encoding="utf-8")

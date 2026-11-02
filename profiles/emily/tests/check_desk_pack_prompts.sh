@@ -68,7 +68,7 @@ done
 
 # Weekly commodities card only. Rates already says "Lenses three lenses + Dominant"
 # without "stub"; this exact phrase must live on the emily weekly card
-# (SOUL Weekly Lenses = three lenses stub + Dominant → Zoe REJECT／Major).
+# (SOUL Weekly Lenses = three lenses stub + Dominant → Zoe REJECT/Major).
 WEEKLY_PROMPTS="${HOST}/desk_pack_weekly_prompts.py"
 LENSES_STUB='Lenses stub + Dominant(Macro/Micro/Market)'
 if grep -Fq "$LENSES_STUB" "$WEEKLY_PROMPTS"; then
@@ -84,7 +84,7 @@ else
 fi
 
 # Daily / W-D1 use SOUL Daily lenses, not the weekly three lenses stub, and keep ≥1 news.
-DAILY_LENSES='Lenses(Macro＋Micro; Market ; Dominant)'
+DAILY_LENSES='Lenses(Macro+Micro; Market ; Dominant)'
 for daily in \
  "${HOST}/desk_pack_daily_train_prompts.py" \
  "${HOST}/desk_pack_w_d1_prompts.py"

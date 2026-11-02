@@ -12,7 +12,7 @@ description: >-
 
 **Owner:** Eliza · **Train:** formal (Draft → Zoe → Eliza revise)  
 **Load with:** `investment/valuation-screener`, `investment/finviz-screener`, `investment/yahoo-finance-data-fetch`, `investment/financial-health` (quality overlay)  
-**Not:** full 12-method DCF · rewriting runner arithmetic · any `tm_score` · desk Risk-on/off final call · Helios `render_weekly_value` swap
+**Not:** full 12-method DCF · rewriting runner arithmetic · any `tm_score` · desk Risk-on/off final call · host `render_weekly_value` swap
 
 Label "Not investment advice". Source grading: `📊 Data` / `📊 Institutional` (SEC / IR).
 
@@ -43,7 +43,7 @@ Yahoo Finance · Finviz · SEC EDGAR · public IR · FRED · live width runner o
 Width scan runner must cover **both** tracks (default / omit `--track`). ❌ `--track A` / `--track B` partial runs — revise must not invent "0 Finviz hits" when JSON has `screened: false` / `partial_run`.
 
 Missing market cap → fail closed: omit from selected + **Omissions**.  
-≠ Helios Option A/B (cache / DCF v3).
+≠ Option A/B (cache / DCF v3).
 
 ---
 

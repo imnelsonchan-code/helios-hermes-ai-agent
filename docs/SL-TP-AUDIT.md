@@ -240,7 +240,7 @@ python3 ~/.hermes/scripts/risk_plan_migrate.py \
 
 Changing a live SL/TP changes risk. Migration therefore never chooses or
 writes a plan without an explicit row-level decision. A legacy trailing stop
-above fill, such as SGLN.L, needs explicit trail history rather than automatic
+above fill, such as TST1.L, needs explicit trail history rather than automatic
 grandfathering.
 
 ## Audit gates

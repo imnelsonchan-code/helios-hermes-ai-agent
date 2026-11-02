@@ -9,7 +9,7 @@ description: >-
 
 # A-08 follow-up — Monday value follow-up
 
-**Owner:** Eliza · **Train:** formal when standalone (Draft → Zoe → Eliza revise) · Helios-aligned **A-08**  
+**Owner:** Eliza · **Train:** formal when standalone (Draft → Zoe → Eliza revise) · desk-aligned **A-08**  
 **Load with:** Sunday lock **revised** pack (prefer JSON), `investment/yahoo-finance-data-fetch` for spot context only  
 **Not:** width re-score · re-rank · inventing `valuation_score` · inventing prices / FV · any `tm_score`
 

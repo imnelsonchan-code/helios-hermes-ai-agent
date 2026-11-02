@@ -617,10 +617,10 @@ def _extract_target(challenge_path: Path) -> tuple[str | None, str | None]:
         re.compile(r'`(/opt/data/reports/(\w+)/[^`]+\.md)`'),
         # Absolute path without backticks: /home/.../.hermes/shared/reports/...
         re.compile(r'(/home/\w+/\.hermes/shared/reports/(\w+)/\S+\.md)'),
- # Report path prefix: **：** `/path`
-        re.compile(r'[：:]\s*`?((?:/~?)?(?:home/\w+/)?\.?hermes/shared/reports/(\w+)/\S+\.md)`?'),
+ # Report path prefix: **:** `/path`
+        re.compile(r'[::]\s*`?((?:/~?)?(?:home/\w+/)?\.?hermes/shared/reports/(\w+)/\S+\.md)`?'),
  # /: `/opt/data/reports/...`
-        re.compile(r'(?:|)[：:]\s*`(/opt/data/reports/(\w+)/[^`]+\.md)`'),
+        re.compile(r'(?:|)[::]\s*`(/opt/data/reports/(\w+)/[^`]+\.md)`'),
     ]
 
     for pat in path_patterns:
@@ -635,7 +635,7 @@ def _extract_target(challenge_path: Path) -> tuple[str | None, str | None]:
 
  # ── Pattern 2: Relative filename in Target: / ──
     rel_patterns = [
-        re.compile(r'(?:Target|||)[：:]\s*(?:[^`\n]*)?`([^`]+\.md)`'),
+        re.compile(r'(?:Target|||)[::]\s*(?:[^`\n]*)?`([^`]+\.md)`'),
         re.compile(r'`(20\d\d-[^`\s]+\.md)`'),  # Any dated filename
         re.compile(r'`([0-9A-Za-z_-]+\.md)`'),   # Any .md filename in backticks
     ]
@@ -661,7 +661,7 @@ def _extract_target(challenge_path: Path) -> tuple[str | None, str | None]:
 
     # ── Pattern 3: Descriptive target (no file path) ──
     desc_patterns = [
-        re.compile(r'(?:Target||)[：:]\s*(\w+)\s+(.+?)(?:\n|$)'),
+        re.compile(r'(?:Target||)[::]\s*(\w+)\s+(.+?)(?:\n|$)'),
     ]
 
     for pat in desc_patterns:
@@ -1187,7 +1187,7 @@ def main():
     if args.format:
         print("""## Zoe Challenge Response Tracker 
 
-， item resolution status：
+, item resolution status:
 
 | Item | Severity | Brief | Resolution | Status |
 |:----:|:--------:|:------|:-----------|:------:|

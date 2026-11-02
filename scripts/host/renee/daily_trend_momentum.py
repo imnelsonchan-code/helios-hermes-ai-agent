@@ -1987,7 +1987,7 @@ def build_suppressed_buy_section(results, regime, spy_adx, prev_scores=None):
         "### Suppressed BUY-eligible (Option G) — Adj score ≥60 candidates",
     ]
     if regime == "choppy":
-        lines.append(f"> SPY ADX {adx_s} — ADX < 25，no trades today（Option G）")
+        lines.append(f"> SPY ADX {adx_s} — ADX < 25,no trades today(Option G)")
     lines.append(
         "| Ticker | Adj | Base | Bracket | Prev | Raw RSI | Verdict | Entry | SL | TP |"
     )
@@ -2632,7 +2632,7 @@ def main():
     report_lines.append(f"")
     # Zoe 09-02 m1 (t_7915ddcc): label must match the ACTUAL universe
     # composition — 25 watchlist (Track A/B, always scored) + N non-watchlist
- # technical_screen passes (Source 、 ATR level). The old
+ # technical_screen passes (Source , ATR level). The old
     # "Daily (Watchlist Only)" label misled readers into thinking all rows
     # were watchlist when 5 (e.g. GILD/AMGN/VRTX/TMO/PAYX) were screen-pass.
     _n_wl_rows = sum(1 for r in results if r["ticker"] in watchlist_tickers)
@@ -2657,8 +2657,8 @@ def main():
         report_lines.append(
             f"> 🔒 **1D% prev-close lock (Zoe 09-07 M1):** data-as-of "
             f"`{change_pct_lock['prev_report']}` report — 1D% "
-            f"（{change_pct_lock['locked_count']} ticker），re-fetch "
-            f"（/ back-adjust）。")
+            f"({change_pct_lock['locked_count']} ticker),re-fetch "
+            f"(/ back-adjust).")
     if regime == "choppy":
         report_lines.append(f"> ⚠️ **Choppy market (ADX < 25) — Option G active: ALL signals suppressed**")
     report_lines.append("> **Dual Score:** X = published `tm`/`daily_score` (Option 6 weighted, **clipped 0–100**) | Y = `base_5indicator_total` (raw unweighted 0–100). Audit: `weighted_total_raw` uncapped (may be >100).")
@@ -2721,22 +2721,22 @@ def main():
             report_lines.append(f"** / Gold ({_gold_date}):**")
             report_lines.append(
                 f"- **Level — GC=F continuous futures:** **${macro_ctx['gold_close']:,.2f}**"
-                f"（⚠️ roll ， macro ；GC=F 1D% roll ， 1D%）")
+                f"(⚠️ roll , macro ;GC=F 1D% roll , 1D%)")
             _gld_level = macro_ctx.get("gold_gld_close")
             if _gld_level is not None:
                 report_lines.append(
                     f"- **Level — GLD ETF:** **${_gld_level:,.2f}**"
-                    f"（{_gold_date} ）")
+                    f"({_gold_date} )")
             gld_pct = macro_ctx.get("gold_gld_1d_pct")
             if gld_pct is not None:
                 # Zoe 09-03 m2 (t_8cd84165): always disclose the gold-specific
                 # material-move threshold so readers know why a GLD move flags
                 # while the equity universe uses a different (5.0%) gate.
-                _reconcile = ("level/return ， reconcile"
+                _reconcile = ("level/return , reconcile"
                               if _gld_level is not None
                               else "GLD level ")
-                gold_line = (f"- **1D% benchmark GLD（ETF）:** {gld_pct:+.2f}%"
-                             f"（{_reconcile}）"
+                gold_line = (f"- **1D% benchmark GLD(ETF):** {gld_pct:+.2f}%"
+                             f"({_reconcile})"
                              f" | material-move : GLD |1D%| ≥ "
                              f"{GOLD_MATERIAL_MOVE_PCT:.1f}% (gold-specific; "
                              f"equity universe {MATERIAL_MOVE_PCT:.1f}% )")
@@ -2786,7 +2786,7 @@ def main():
         if added:
             univ_parts.append("+" + ", +".join(added))
         report_lines.append(f"> ⚠️ **Universe change ({prev_total}→{len(results)}):** {' '.join(univ_parts)} — "
-                            f"Change universe ，/。")
+                            f"Change universe ,/.")
         # Zoe 09-02 P1 #1 (t_7915ddcc): NEVER write a bare "−PFE" when the
         # ticker was dropped by technical_screen — disclose the screen_failed
         # cause + prev-day context (score / rank) so a material omission
@@ -2800,15 +2800,15 @@ def main():
             _rk = sf.get("prev_rank")
             _ctx = ""
             if _sc is not None:
-                _ctx = f"； Adj {_sc:.1f}"
+                _ctx = f"; Adj {_sc:.1f}"
                 if _rk:
                     _ctx += f" #{_rk}"
             _near = " ⚠️ **top-10 near-miss**" if (_rk is not None and _rk <= 10) else ""
             removed_explain.append(
-                f"{t}: technical_screen （{sf['reason']}； watchlist ）{_ctx}{_near}")
+                f"{t}: technical_screen ({sf['reason']}; watchlist ){_ctx}{_near}")
         if removed_explain:
             report_lines.append(
-                f"> ⚠️ ** (technical_screen):** " + "；".join(removed_explain) + "。")
+                f"> ⚠️ ** (technical_screen):** " + ";".join(removed_explain) + ".")
         # Zoe 09-02 P1 #2: near-miss alert — yesterday top-10 members removed
         # by ANY rule must be flagged, not just Rule 5 removals.
         top10_removed = [t for t in removed
@@ -2818,7 +2818,7 @@ def main():
         if top10_removed:
             report_lines.append(
                 f"> ⚠️ **near-miss:** {', '.join(top10_removed)} top-10 "
-                f" universe（ technical_screen ）—— 。")
+                f" universe( technical_screen )—— .")
     # Zoe 09-02 P1 #2 (t_7915ddcc): Rule 5 hysteresis retention disclosure.
     # Incumbents whose 20-day mean daily range fell inside [1.8%, 2.0%) are
     # KEPT (admission threshold only applies to new candidates) — say so,
@@ -2833,17 +2833,17 @@ def main():
             rng_s = f"{rng:.3f}%" if rng is not None else "?"
             _ctx = ""
             if hk.get("prev_score") is not None:
-                _ctx = f"（ Adj {hk['prev_score']:.1f}"
+                _ctx = f"( Adj {hk['prev_score']:.1f}"
                 if hk.get("prev_rank"):
                     _ctx += f" #{hk['prev_rank']}"
-                _ctx += "）"
+                _ctx += ")"
             _hk_lines.append(f"{t} 20 {rng_s} ∈ "
                              f"[{RULE5_KEEP_PCT:.1f}%, {RULE5_ADMIT_PCT:.1f}%) {_ctx}")
         report_lines.append(
-            f"> 🧲 **Rule 5 hysteresis (Zoe 09-02):** " + "；".join(_hk_lines) +
-            f" — admission {RULE5_ADMIT_PCT:.1f}% ； "
-            f"universe {RULE5_KEEP_PCT:.1f}%， top-ranked stock "
-            f" flicker in/out。")
+            f"> 🧲 **Rule 5 hysteresis (Zoe 09-02):** " + ";".join(_hk_lines) +
+            f" — admission {RULE5_ADMIT_PCT:.1f}% ; "
+            f"universe {RULE5_KEEP_PCT:.1f}%, top-ranked stock "
+            f" flicker in/out.")
     report_lines.append(f"")
     # prev BUY = effective BUY count from previous daily verdicts (Option G aware),
     # falling back to bracket-sum only when no daily report exists (first run).
@@ -2866,8 +2866,8 @@ def main():
     # M1 (Zoe 08-27 / CLIP+RAW): backtest WR table and live published brackets
     # now share the clipped 0-100 ruler; disclose weighted_total_raw separately
     # so readers do not treat uncapped audit as the published score.
-    report_lines.append(f"> **⚠️ M1 Scale:** live published `daily_score` / bracket **clipped 0–100**（ backtest WR ruler）；`weighted_total_raw` uncapped （ >100）。")
-    report_lines.append(f"> **⚠️ m2 (Zoe 08-28):** backtest v2.1 **5-bucket**（<60 ）；live/rolling **6-bucket**（50-59 / <50）。 backtest 「<60」= live 「50-59 + <50」****， population—— 60-69 <60 scale + bucket scheme 。")
+    report_lines.append(f"> **⚠️ M1 Scale:** live published `daily_score` / bracket **clipped 0–100**( backtest WR ruler);`weighted_total_raw` uncapped ( >100).")
+    report_lines.append(f"> **⚠️ m2 (Zoe 08-28):** backtest v2.1 **5-bucket**(<60 );live/rolling **6-bucket**(50-59 / <50). backtest '<60'= live '50-59 + <50'****, population—— 60-69 <60 scale + bucket scheme .")
     report_lines.append(f"")
     report_lines.append(f"| Bracket | Backtest WR | n | MaxDD | Status |")
     report_lines.append(f"|---------|:-----------:|:-----:|:-----:|:------:|")
@@ -2945,8 +2945,8 @@ def main():
             # latest-week number must NOT be compared to full-week history.
             report_lines.append(
                 f"> ⚠️ ** {rolling_wr.get('window_end')} partial-week resolve**"
-                f"（live daily SMA10 partial fwd return）— WR ，"
-                f"** full-week **。"
+                f"(live daily SMA10 partial fwd return)— WR ,"
+                f"** full-week **."
             )
         else:
             report_lines.append(
@@ -3013,30 +3013,30 @@ def main():
     # The Driver column therefore leads with the RAW RSI delta (market
     # direction); [sub ±N] is the zone jump, secondary. Formal doc (Zoe
     # option a): oversold = bullish mean-reversion.
-    report_lines.append(f"**RSI (Zoe 09-01 M1, document):** RSI sub-score intentionally —— <30（oversold ）→ mean-reversion（，backtest ）；30–40（）→ ；70–75（momentum ）→ ；>75（overbought）→ 5。**：** raw RSI （e.g. 30→26）sub-score —— **「 gainer」「」，，**。Driver primary raw RSI delta（），`[sub ±N]` zone （secondary），。")
+    report_lines.append(f"**RSI (Zoe 09-01 M1, document):** RSI sub-score intentionally —— <30(oversold )→ mean-reversion(,backtest );30–40()→ ;70–75(momentum )→ ;>75(overbought)→ 5.**:** raw RSI (e.g. 30→26)sub-score —— **' gainer''',,**.Driver primary raw RSI delta(),`[sub ±N]` zone (secondary),.")
     report_lines.append(f"**Dual Score:** published daily_score (clipped 0–100) | base_5indicator_total (raw unweighted 0–100); audit weighted_total_raw uncapped")
     report_lines.append(f"**Order:** Daily score descending")
     # m3 fix (Zoe 08-27, t_692f4462): the Weekly column sources from
     # weekly_snapshots (not this run's data.json) — state it so the Zoe #70
     # cross-section claim is scoped honestly. weekly_score is also written
     # into data.json for future verification coverage.
-    report_lines.append(f"> **Weekly (m3):** `weekly_snapshots`（ data.json ）；"
-                        f"Zoe #70 cross-section Adj/Base/1D%/bracket， Weekly （"
-                        f"weekly_score data.json ）。")
+    report_lines.append(f"> **Weekly (m3):** `weekly_snapshots`( data.json );"
+                        f"Zoe #70 cross-section Adj/Base/1D%/bracket, Weekly ("
+                        f"weekly_score data.json ).")
  # Zoe 09-04 M1 (t_94cfd4c8): column renamed to Adj and
     # the methodology is now auto-disclosed right above the table — source /
     # window / update frequency / sector sample — so readers never read it
     # as a sector rotation or relative-strength signal (an intra-universe
     # cross-sectional average recomputed fresh each run; single-member
     # sector = that member's Adj round).
-    report_lines.append(f"> 🟡 **M1 (Zoe 09-04):** 「Adj」 = ** universe"
-                        f"（{len(all_rankings)} ） sector Adj ，round **。"
-                        f"Source = run scoring results（`results[].total`，Adj ）；"
-                        f"Window = **（non-rolling）**； = ****；"
-                        f"Sector = ** universe **（ sector ETF、 broader "
-                        f"market ）。 sector（ BM = LIN、CD = CL） = Adj "
-                        f"round。** cross-sectional score sector attribution， "
-                        f"sector / ， rotation 。**")
+    report_lines.append(f"> 🟡 **M1 (Zoe 09-04):** 'Adj' = ** universe"
+                        f"({len(all_rankings)} ) sector Adj ,round **."
+                        f"Source = run scoring results(`results[].total`,Adj );"
+                        f"Window = **(non-rolling)**; = ****;"
+                        f"Sector = ** universe **( sector ETF, broader "
+                        f"market ). sector( BM = LIN,CD = CL) = Adj "
+                        f"round.** cross-sectional score sector attribution, "
+                        f"sector / , rotation .**")
     report_lines.append(f"")
 
     # Add 1D% column (Zoe Rubric #80). Sector column shows the Adj mean of
@@ -3123,11 +3123,11 @@ def main():
  # tables so the inline ⚠️ / [sub↔raw ] meaning never drifts from the
     # table that carries it (report-layer readability, generator-owned).
     report_lines.append(f"> ⚠️ **m3 inline flags (Zoe 09-04):** `⚠️` = scoreΔ 1D% "
-                        f"（score gainer / score loser ）—— ≠ ， RSI "
-                        f" + indicator （ Full Ranking legend）。"
+                        f"(score gainer / score loser )—— ≠ , RSI "
+                        f" + indicator ( Full Ranking legend)."
                         f"`[sub↔raw opposite]` = RSI sub-score raw RSI delta "
-                        f"（ VRTX raw 76.2→65.0 −11.2 sub +10 = overbought ；"
-                        f"HD raw 26.6→34.9 +8.3 sub −10 = oversold ）—— /。")
+                        f"( VRTX raw 76.2→65.0 −11.2 sub +10 = overbought ;"
+                        f"HD raw 26.6→34.9 +8.3 sub −10 = oversold )—— /.")
     report_lines.append(f"")
 
     # New BUY signals
@@ -3226,7 +3226,7 @@ def main():
         tag = ""
         if is_new: tag = " 🆕 NEW BUY"
         elif is_lost: tag = " ⛔ LOST BUY"
- # P1-5 fix (t_1dacac8d): surge/plunge labels must carry 「 Δ」
+ # P1-5 fix (t_1dacac8d): surge/plunge labels must carry ' Δ'
         # prefix so they can't be confused with 1D% price moves.
         elif c["change"] >= 10: tag = " 🔥 Δ surge"
         elif c["change"] <= -10: tag = " 💥 Δ plunge"
@@ -3276,8 +3276,8 @@ def main():
                 f"| {t} | ${r.get('close','?'):.2f} | {icon} {chg_pct_v:+.2f}% | "
                 f"{r['total']:.1f} | {r.get('verdict','')} | {_note} |")
         report_lines.append(f"")
-        report_lines.append(f"> Flag : |1D%| ≥ {MATERIAL_MOVE_PCT:.0f}%（Zoe 09-02 m2）— gold 🔴 material move "
-                            f" flag family；🔴 = ≥{MATERIAL_MOVE_PCT:.0f}%，🟢 = ≥{MATERIAL_MOVE_PCT:.0f}%。")
+        report_lines.append(f"> Flag : |1D%| ≥ {MATERIAL_MOVE_PCT:.0f}%(Zoe 09-02 m2)— gold 🔴 material move "
+                            f" flag family;🔴 = ≥{MATERIAL_MOVE_PCT:.0f}%,🟢 = ≥{MATERIAL_MOVE_PCT:.0f}%.")
         report_lines.append(f"")
 
     # Also show top 5 BUY signals overall if we haven't covered them

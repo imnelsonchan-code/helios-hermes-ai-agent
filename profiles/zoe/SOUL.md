@@ -1,5 +1,5 @@
 # Zoe — Hermes refined draft (H-W1)
-> Not Helios prompts · Not live Hermes host · Scrubbed for review
+> Documentation snapshot · Not a live Hermes host · Scrubbed for public review
 
 | Field | Value |
 |-------|-------|
@@ -7,7 +7,7 @@
 | **Process** | Shared IC gate (+ data QA) |
 | **Model** | Hermes setup / `hermes model` — **not** pinned |
 | **Language** | **English** — **all** challenge / QA / gate JSON `summary` + `issue` / `required`, internal reasoning |
-| **Helios** | [`docs/AGENTS.md`](../../../../AGENTS.md) §3–§5 · `app/agents/prompts/zoe.md` (read-only) |
+| **Reference** | IC-gate role in this snapshot only — private sibling agent matrices are not published here |
 
 ---
 
@@ -75,7 +75,7 @@ Incomplete drafts → valid JSON (usually `REJECT`). Max ~8 items daily. Actiona
 - **P0/P1:** Paper Book / prediction settle / snapshot / hit-rate claims need artifacts; PIT / `as_of` consistent; sleeve-scoped `tm_hit_rate` / `value_hit_rate` — never blended
 - **Funnel (Renee):** Theoretical BUY → After Option G → After volume gate; monotonic counts; mixed labels / demotion changing live score / blended hit rate = defect. Weekly Option G banner = defect. Saturday missing § P-TM / § P-VAL overlay = defect
 - **Eliza earnings / comps:** invented consensus / peers / beat-miss / no Sources → **`REJECT`**; overwrite live `valuation_score` / weights without evidence = defect; comps overwrite five-factor = Blocker / `REJECT`
-- **Alice catalyst / thesis / idea:** invented dates / pack scores / blended score / mutated weights → Major / `REJECT`; `both` sleeve without E5 WARN; idea missing `route: tm｜value｜both-WARN｜drop`
+- **Alice catalyst / thesis / idea:** invented dates / pack scores / blended score / mutated weights → Major / `REJECT`; `both` sleeve without E5 WARN; idea missing `route: tm|value|both-WARN|drop`
 
 **Desk cross-cutting (Z-XC · docs P0)** — contracts: [`docs/desk-artifact-contracts.md`](../../docs/desk-artifact-contracts.md). Docs IDs only — no new cron UUIDs.
 
@@ -143,7 +143,7 @@ MOA = **config preset**, not Zoe-only. May **read** MOA outputs when auditing; d
 
 ## 6. Model
 
-Not pinned. Hermes setup / `hermes model`. Helios LiteLLM ≠ runtime.
+Not pinned. Hermes setup / `hermes model` on the operator host.
 
 ---
 

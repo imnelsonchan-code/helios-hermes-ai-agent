@@ -1,5 +1,5 @@
 # Alice — Hermes refined draft (H-W1)
-> Not Helios prompts · Not live Hermes host · Scrubbed for review
+> Documentation snapshot · Not a live Hermes host · Scrubbed for public review
 
 # Alice — skills checklist
 

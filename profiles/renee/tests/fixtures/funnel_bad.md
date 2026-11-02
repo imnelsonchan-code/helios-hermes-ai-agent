@@ -1,11 +1,11 @@
-# renee · T&M signal funnel — BAD fixture（negative control）
+# renee · T&M signal funnel — BAD fixture(negative control)
 
 **Purpose:** Intentionally violate funnel monotonicity so the audit's negative control can FAIL this file.  
 **Do not use as a template for real revise.**
 
 ---
 
-## § T&M signal funnel（eval overlay — T sleeve only）
+## § T&M signal funnel(eval overlay — T sleeve only)
 
 | Field | Value |
 |-------|-------|
