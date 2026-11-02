@@ -1,0 +1,185 @@
+# =============================================================================
+# DOCUMENTATION WORKFLOW — Hermes refine only
+# Not live host cron. Not auto-executing. Not Helios app.
+# Saturday S1 sketch — P-TM arm / P-VAL arm / Alice S1 split hit rates.
+# Reference labels only. No live cron IDs in body.
+# Live mapping (ops): docs/cron-jobs.md · docs/SAT-SUN-FIXES.md
+# Artifact contracts: docs/desk-artifact-contracts.md
+# =============================================================================
+
+name: desk-pack-saturday
+kind: documentation_workflow
+status: draft_refine
+cadence_label: "Saturday self-review Phase 2 (S1)"
+schedule_note: "Logical Saturday midday serial self-review; clock owned by host ops — not defined here"
+
+purpose: >
+  Serial specialist self-review arms then Alice integrate → Mercury Decide ENFORCE
+  → spawn APPROVE topics → Zoe R1 → Alice revise.
+  Portal light = Alice weekly-performance overall ONLY
+  (exact stem weekly-performance/{iso_week}-phase2-summary-revised.md).
+  Specialist reviews stay workspace + shared — not rates-session / commodities-session Jobs lights.
+
+hard_rules:
+  - E5_no_blend
+  - fail_closed
+  - broker_quarantine
+  - session_summary_required
+  - split_hit_rates  # tm_hit_rate and value_hit_rate on separate lines — never blended
+  - option_a_iso_week  # YYYY-Www = stdout of date -u +%G-W%V (literal W; example 2026-W43); never W+1; same-week overwrite OK; ban stem 2026-43
+  - inbox_abs_path  # $REPORTS_INBOX/ only; never ~/.hermes/shared/inbox/
+
+serial_arms:
+  - id: arm_emily
+    label: "Arm — emily commodities self-review"
+    assignee: emily
+    depth: same_as_equity_arms  # Part A/B/C
+    save: shared/reports/emily/self-review/YYYY-Www-*-review.md
+    forbidden_portal: [inbox/commodities-session]
+    notes:
+      - "Roll this fire-Saturday ISO week's Mon–Fri commodities-session *-revised.md (token date -u +%G-W%V, example 2026-W43); check ART-SESSION-SUMMARY"
+      - "Never invent commodity_hit_rate; never blend with tm/value scores"
+
+  - id: arm_christina
+    label: "Arm — christina rates self-review"
+    assignee: christina
+    depends_on: [arm_emily]
+    save: shared/reports/christina/self-review/YYYY-Www-*-review.md
+    forbidden_portal: [inbox/rates-session]
+    notes:
+      - "FedWatch cite-or-miss only — do not touch FedWatch cron"
+      - "Never invent rates_hit_rate"
+
+  - id: arm_p_tm
+    label: "Arm — P-TM (Renee)"
+    assignee: renee
+    depends_on: [arm_christina]
+    artifacts_in:
+      - ART-TM-SESSION-D
+      - ART-TM-SESSION-W
+      - ART-TM-DAILY-EVAL
+      - ART-WEEKLY-EVAL
+    required_sections:
+      - "§ P-TM eval overlay audit"
+    save: shared/reports/renee/self-review/YYYY-Www-*-review.md
+    notes:
+      - "Funnel roll-up = aggregate Mon–Fri ART-TM-DAILY-EVAL (theo → after_G → after_vol) — never invent from weekly-eval alone"
+      - "Cite book_t + settlement.tm_hit_rate from prior-week/latest ART-WEEKLY-EVAL; N/A if missing"
+      - "NEVER cite value_hit_rate in this arm (Z-XC-07)"
+
+  - id: arm_p_val
+    label: "Arm — P-VAL (Eliza)"
+    assignee: eliza
+    depends_on: [arm_p_tm]
+    artifacts_in:
+      - ART-VAL-WIDTH-REVISED
+      - ART-VAL-SESSION
+      - ART-E5-OVERLAP
+      - ART-WEEKLY-EVAL
+    required_sections:
+      - "§ P-VAL eval overlay audit"
+    save: shared/reports/eliza/self-review/YYYY-Www-*-review.md
+    notes:
+      - "Audit numeric valuation_score on every published selected name; omissions hygiene"
+      - "Cite book_v + settlement.value_hit_rate only — never tm_hit_rate / never blend (Z-XC-07)"
+      - "E5 overlap list WARN only; value-session must not have emitted tm_score (Z-XC-05)"
+
+  - id: arm_alice_self
+    label: "Arm — Alice self-review"
+    assignee: alice
+    depends_on: [arm_p_val]
+    save: shared/reports/alice/weekly-performance-review/YYYY-Www-*-review.md
+    notes:
+      - "Process / macro / catalyst hygiene — not a second full weekly deep-dive"
+
+  - id: arm_zoe_self
+    label: "Arm — Zoe self-review / QA"
+    assignee: zoe
+    depends_on: [arm_alice_self]
+    save: shared/reports/zoe/weekly-self-review/YYYY-Www-*-review.md
+    notes:
+      - "Data QA / challenge-quality patterns only — still never write portal *-revised.md"
+
+alice_s1:
+  - id: integrate
+    label: "Alice S1 integrate"
+    assignee: alice
+    depends_on: [arm_zoe_self]
+    skill_hint: four-specialist-integrate
+    mode: sat-overall
+    artifacts_in:
+      - ART-WEEKLY-EVAL
+      - ART-SESSION-SUMMARY  # cite prior Sunday 5-pack or miss
+    portal: inbox/weekly-performance/YYYY-Www-phase2-summary-revised.md
+    jobs_glob: "{iso_week}-phase2-summary-revised.md"
+    split_hit_rates:
+      line_1: "book_t + settlement.tm_hit_rate"
+      line_2: "book_v + settlement.value_hit_rate"
+      if_missing: "N/A (Sat often precedes same-week weekly-eval — use prior-week / latest)"
+      forbid: "blended hit rate / single combined WR / bare hit_rate"
+    notes:
+      - "One portal light only — do not open second full weekly overall"
+      - "Cite prior Sunday 5-pack revised paths or miss+reason"
+      - "Option A: YYYY-Www = stdout of date -u +%G-W%V on Saturday fire day (literal W; example 2026-W43); never W+1 bump; same-week overwrite OK; ban stem 2026-43"
+      - "Absolute inbox: $REPORTS_INBOX/weekly-performance/ — never ~/.hermes/shared/inbox/"
+
+  - id: mercury_decide
+    label: "Mercury Decide ENFORCE (Zoe New Topics)"
+    assignee: alice
+    depends_on: [integrate]
+    notes:
+      - "Host sidecar mercury_decide.py --scope sat --mode enforce"
+      - "Telegram Yes/No + scores; ledger shared/reports/mercury/YYYY-Www-improvement-decisions.json"
+      - "FAIL-OPEN on DECIDE_UNAVAILABLE; kill switch MERCURY_DECIDE_MODE=off"
+      - "Never write portal *-revised.md"
+
+  - id: spawn_approved
+    label: "Spawn APPROVE topics only"
+    assignee: alice
+    depends_on: [mercury_decide]
+    notes:
+      - "kanban_create only for approve_topic_ids; Alice/Eliza/Renee/Christina/Emily"
+      - "Idempotent via mercury spawned stamp"
+
+  - id: zoe_r1
+    label: "Zoe challenge R1"
+    assignee: zoe
+    depends_on: [spawn_approved]
+    notes:
+      - "Z-XC-01…08; REJECT blended leaderboard / blended hit rates / broker language"
+      - "Cite Mercury ledger only — do not re-litigate Decide scores"
+
+  - id: alice_revise
+    label: "Alice revise after Zoe"
+    assignee: alice
+    depends_on: [zoe_r1]
+    portal: inbox/weekly-performance/YYYY-Www-phase2-summary-revised.md
+    reviser: alice
+
+when_not_to_run:
+  - id: missing_prior_week_packs
+    stub: true
+    reason: "No prior Sunday 5-pack and no prior ART-WEEKLY-EVAL — ship N/A lines; do not invent hit rates"
+  - id: write_session_inbox_on_sat
+    stub: true
+    reason: "Sat reviews must not write inbox/rates-session or inbox/commodities-session as portal lights"
+  - id: blend_p_tm_p_val
+    stub: true
+    reason: "Do not merge § P-TM and § P-VAL into one scoreboard or one hit-rate number"
+  - id: option_g_from_weekly_only
+    stub: true
+    reason: "Do not invent daily Option G funnel counts from weekly-eval alone"
+  - id: sat_w_plus_one_bump
+    stub: true
+    reason: "Do not bump ISO week to W+1 to avoid overwrite; Option A overwrites same-week portal file"
+
+reviser_map:
+  specialist_self_reviews: "owner of each arm (emily/christina/renee/eliza/alice) — shared paths only"
+  s1_portal: alice
+  zoe: null
+
+references:
+  contracts: docs/desk-artifact-contracts.md
+  profiles: docs/PROFILES.md
+  live_ops_catalog: docs/cron-jobs.md
+  sat_sun_fixes: docs/SAT-SUN-FIXES.md

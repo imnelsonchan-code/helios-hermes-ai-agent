@@ -1,0 +1,161 @@
+# =============================================================================
+# DOCUMENTATION WORKFLOW — Hermes refine only
+# Not live host cron. Not auto-executing. Not Helios app.
+# Logical waves / labels only — do NOT invent or paste live cron IDs in the body.
+# Live mapping (ops): docs/cron-jobs.md · docs/PROFILES.md
+# Artifact contracts: docs/desk-artifact-contracts.md
+# =============================================================================
+
+name: desk-pack-daily
+kind: documentation_workflow
+status: draft_refine
+cadence_label: "Mon–Fri Desk Pack (W-D1)"
+schedule_note: "Logical evening train after US close; clock owned by host ops — not defined here"
+
+purpose: >
+  Four specialist sessions + Alice overall in one logical train:
+  Wave1 parallel christina||renee → Wave2 parallel emily||eliza →
+  Alice overall → Zoe IC → Alice revise.
+
+hard_rules:
+  - E5_no_blend
+  - fail_closed
+  - broker_quarantine
+  - session_summary_required
+  - market_insight_required
+  - macro_view_alice_only
+
+waves:
+  - id: wave1
+    label: Wave1
+    mode: parallel
+    legs:
+      - id: rates_session
+        assignee: christina
+        display: "christina · rates"
+        artifacts_out: [ART-SESSION-SUMMARY, ART-MARKET-INSIGHT]
+        portal: inbox/rates-session/YYYY-MM-DD-*-revised.md
+        notes:
+          - "FedWatch consume-only (cite-or-miss); do not cron-run FedWatch from this leg"
+          - "rates_regime ≠ desk Risk-on/off"
+          - "REQUIRED ## Market insight (rates-domain); Alice pull in Session summary"
+      - id: tm_session_daily
+        assignee: renee
+        display: "renee · P-TM"
+        artifacts_in: [ART-TM-DAILY-PACK]
+        artifacts_out: [ART-TM-SESSION-D, ART-SESSION-SUMMARY, ART-MARKET-INSIGHT]
+        portal: inbox/daily-trend-momentum/YYYY-MM-DD-*-report-revised.md
+        notes:
+          - "Reviser = renee (not alice); no re-score"
+          - "Per-leg: draft → Zoe → renee revise (before Alice overall)"
+          - "Cite ART-TM-DAILY-EVAL funnel when present; else N/A + pending"
+          - "REQUIRED ## Market insight + News/Market + Lenses; no desk Risk-on/off"
+          - "Generator inserts G1 after Header; revise MUST keep four headings — forbidden to claim this report has no ## Market insight"
+
+  - id: wave2
+    label: Wave2
+    mode: parallel
+    depends_on: [wave1]
+    soft_barrier: "Prefer Wave1 revised|miss available; hard-fail of one Wave1 leg → miss/attempted, Wave2 still runs"
+    legs:
+      - id: commodities_session
+        assignee: emily
+        display: "emily · commodities"
+        artifacts_out: [ART-SESSION-SUMMARY, ART-MARKET-INSIGHT]
+        portal: inbox/commodities-session/YYYY-MM-DD-*-revised.md
+        notes:
+          - "emily ≠ broker Emily (M7)"
+          - "Cite same-session Wave1 inbox or miss — do not invent FX Est / B_* / Rate Δbp"
+          - "REQUIRED ## Market insight (cite commodity-insight); commodity_regime ≠ desk Risk-on/off"
+          - "REQUIRED Lenses (Macro + Micro; Market one line; Dominant)"
+      - id: value_session
+        assignee: eliza
+        display: "eliza · P-VAL"
+        artifacts_out: [ART-VAL-SESSION, ART-SESSION-SUMMARY, ART-MARKET-INSIGHT]
+        portal: inbox/value-session/YYYY-MM-DD-*-revised.md
+        notes:
+          - "Reviser = eliza (not alice); cite Sunday lock valuation_score (numeric) or skip+miss; no tm_score; no reshuffle value-100"
+          - "Per-leg: draft → Zoe → eliza revise (before Alice overall)"
+          - "E5 overlap WARN only"
+          - "REQUIRED ## Market insight + News/Market + Lenses; no desk Risk-on/off"
+
+  - id: alice_overall
+    label: Alice overall
+    mode: serial
+    depends_on: [wave2]
+    soft_barrier: "Soft-wait four *-revised.md or explicit miss+reason; honest four-path ok|miss|pending-rechallenge"
+    assignee: alice
+    skill_hint: four-specialist-integrate
+    artifacts_in:
+      - ART-SESSION-SUMMARY
+      - ART-MARKET-INSIGHT
+      - ART-TM-SESSION-D
+      - ART-VAL-SESSION
+    artifacts_out: [ART-SESSION-SUMMARY, ART-MACRO-VIEW]
+    portal:
+      - inbox/market-close/YYYY-MM-DD-*-summary-revised.md
+      - inbox/daily-social/YYYY-MM-DD-*-summary-revised.md
+    notes:
+      - "E5++ juxtapose only — no blended leaderboard"
+      - "REQUIRED Alice own ## Session summary after Header (5–8 bullets), distinct from four cites"
+      - "Cite Four Market insights (prefer) + Session summaries; REQUIRED ## Macro view (8–15 lines daily); ## Gaps / callbacks"
+      - "Trunk: skills/market-close-report-format (ten ## headings). Retired 12-section Integration Template is not the trunk"
+      - "Desk Risk-on/off + Macro view owned by Alice; do not paste full specialist essays"
+      - "Honest four-path: ok = same-day inbox revised AND Zoe PASS / no re-challenge; stale/T-1/unre-challenged → miss or as-of T-1 + gap"
+      - "Daily Relationships ≤2–4 SENTENCES — no weekly-style table; ≤1 callback targets train-blocking material_gap"
+      - "Forbidden: owner self-claim 5/5 revision stands / PASS — Zoe re-votes"
+
+  - id: zoe_gate
+    label: Zoe IC
+    mode: serial
+    depends_on: [alice_overall]
+    assignee: zoe
+    artifacts_out: []
+    notes:
+      - "REJECT missing ## Session summary or ## Market insight or missing cite/miss"
+      - "Cross-cutting checks Z-XC-01…08 + Z-MI-01…05 apply"
+      - "Per-leg Zoe already ran inside Wave1/Wave2 before this overall gate (see leg notes)"
+      - "Zoe ran ≠ PASS — re-challenge before four-path ok"
+
+  - id: alice_revise
+    label: Alice revise
+    mode: serial
+    depends_on: [zoe_gate]
+    assignee: alice
+    portal:
+      - inbox/market-close/YYYY-MM-DD-*-summary-revised.md
+      - inbox/daily-social/YYYY-MM-DD-*-summary-revised.md
+    notes:
+      - "Reviser for overall #5 = alice only — do not route revise to four specialists"
+
+post_steps_stub:
+  - id: tm_exit_overlay_stub
+    label: "Post — T&M signal + exit overlay (host-owned)"
+    note: "Logical terminal after Alice revise; implementation lives on host scripts — not defined in this refine YAML."
+
+when_not_to_run:
+  - id: holiday_us_equity_closed
+    stub: true
+    reason: "US cash equity session holiday / early close — skip or slim per owner ops policy"
+  - id: data_plane_down
+    stub: true
+    reason: "Generator / Yahoo / venv hard-fail preflight — prefer miss/attempted over invented packs"
+  - id: absorbed_leg_resume
+    stub: true
+    reason: "Do not resume paused single-leg clocks absorbed into this train (ops catalog)"
+  - id: fedwatch_steal
+    stub: true
+    reason: "Never hermes cron-run FedWatch from desk-pack legs"
+
+reviser_map:
+  rates_session: christina
+  tm_session_daily: renee
+  commodities_session: emily
+  value_session: eliza
+  alice_overall: alice
+  zoe_gate: null
+
+references:
+  contracts: docs/desk-artifact-contracts.md
+  profiles: docs/PROFILES.md
+  live_ops_catalog: docs/cron-jobs.md

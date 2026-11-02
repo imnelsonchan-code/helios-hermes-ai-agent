@@ -1,0 +1,32 @@
+# Local / secrets
+.env
+.env.*
+!.env.example
+*.pem
+id_rsa*
+id_ed25519*
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Backups pulled from host
+_backups/
+*.bak
+
+# Live restore snapshot (not published). Collect writes here locally.
+restore/pack/
+restore/work/
+
+# Local review dumps / bytecode
+.tmp-*
+**/__pycache__/
+
+# Local / generated
+.venv*/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+scripts/_*

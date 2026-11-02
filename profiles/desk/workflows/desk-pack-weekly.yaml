@@ -1,0 +1,148 @@
+# =============================================================================
+# DOCUMENTATION WORKFLOW — Hermes refine only
+# Not live host cron. Not auto-executing. Not Helios app.
+# Sunday cars sketch — reference labels only (Car 1…5). No live cron IDs in body.
+# Live mapping (ops): docs/cron-jobs.md · docs/SAT-SUN-FIXES.md
+# Artifact contracts: docs/desk-artifact-contracts.md
+# =============================================================================
+
+name: desk-pack-weekly
+kind: documentation_workflow
+status: draft_refine
+cadence_label: "Sunday full Desk Pack"
+schedule_note: "Logical Sunday midday serial train; clock owned by host ops — not defined here"
+
+purpose: >
+  Five portal cars in one logical Sarah train (serial parents= style):
+  christina → emily → weekly T&M → Eliza width → Alice overall.
+  Aligns with daily W-D1 (rates before commodities so emily can cite Car1 FX/rates).
+  One car hard-fail → miss/attempted, continue next car.
+
+hard_rules:
+  - E5_no_blend
+  - fail_closed
+  - broker_quarantine
+  - session_summary_required
+  - market_insight_required
+  - macro_view_alice_only
+
+cars:
+  - id: car1
+    label: "Car 1 — christina weekly rates"
+    assignee: christina
+    display: "christina · rates"
+    mode: weekly_depth
+    artifacts_out: [ART-SESSION-SUMMARY, ART-MARKET-INSIGHT]
+    portal: inbox/rates-session/YYYY-Www-*-revised.md
+    notes:
+      - "FedWatch consume-only; rates_regime ≠ desk Risk-on/off"
+      - "Prefer alice/fedwatch/latest.json then same-day dated"
+      - "REQUIRED ## Market insight (rates-domain)"
+
+  - id: car2
+    label: "Car 2 — emily weekly commodities"
+    assignee: emily
+    display: "emily · commodities"
+    depends_on: [car1]
+    artifacts_out: [ART-SESSION-SUMMARY, ART-MARKET-INSIGHT]
+    portal: inbox/commodities-session/YYYY-Www-*-revised.md
+    notes:
+      - "emily ≠ broker Emily (M7)"
+      - "commodity_regime ≠ desk Risk-on/off"
+      - "FX/rates cite Car 1 / same-week or miss — no invented FX Est"
+      - "REQUIRED ## Market insight (cite commodity-insight)"
+      - "REQUIRED Lenses three-lens stub + Dominant (Macro/Micro/Market)"
+      - "REQUIRED News/Market 2–3 Emily-topic sentences + calendar (URL ≤12) or News: miss"
+
+  - id: car3
+    label: "Car 3 — Renee weekly T&M"
+    assignee: renee
+    depends_on: [car2]
+    artifacts_in: [ART-TM-WEEKLY-PACK]
+    artifacts_out: [ART-TM-SESSION-W, ART-SESSION-SUMMARY, ART-MARKET-INSIGHT]
+    portal: inbox/weekly-trend-momentum/YYYY-WW-*-trend-momentum-report-revised.md
+    notes:
+      - "Paste generator tables (Risk% + ATR14%); SPY ADX fail-closed"
+      - "NO Option G banner on weekly (Z-XC-06)"
+      - "REQUIRED ## Market insight + News/Market + Lenses; no desk Risk-on/off"
+      - "Reviser = renee; optional Book T footnote from prior ART-WEEKLY-EVAL only"
+
+  - id: car4
+    label: "Car 4 — Eliza valuation width"
+    assignee: eliza
+    depends_on: [car3]
+    artifacts_in: [ART-TM-WEEKLY-PACK]
+    artifacts_out:
+      - ART-VAL-WIDTH-PACK
+      - ART-VAL-WIDTH-REVISED
+      - ART-E5-OVERLAP
+      - ART-SESSION-SUMMARY
+      - ART-MARKET-INSIGHT
+    portal: inbox/valuation-width/YYYY-WW-*-valuation-width-revised.md
+    notes:
+      - "valuation_score only — never tm_score / bare score"
+      - "Run BOTH tracks A+B (omit --track); ❌ --track A / --track B partial runs"
+      - "Same-week T&M overlap → e5_overlap WARN; do not change either sleeve's ranks"
+      - "Optional WoW validate stub after revise (host script class)"
+      - "REQUIRED ## Market insight + News/Market + Lenses; no desk Risk-on/off"
+
+  - id: car5
+    label: "Car 5 — Alice weekly overall (deep-dive)"
+    assignee: alice
+    depends_on: [car4]
+    skill_hint: four-specialist-integrate
+    artifacts_in:
+      - ART-SESSION-SUMMARY
+      - ART-MARKET-INSIGHT
+      - ART-TM-SESSION-W
+      - ART-VAL-WIDTH-REVISED
+      - ART-E5-OVERLAP
+    artifacts_out: [ART-SESSION-SUMMARY, ART-MACRO-VIEW]
+    portal: inbox/weekly-deep-dive/YYYY-MM-DD-Wnn-weekly-deep-dive-revised.md
+    jobs_glob: "{date}*-revised.md"
+    notes:
+      - "Live hybrid stem (DATE_UTC + W%V) — not pure YYYY-WW-*; matches Jobs {date}* glob"
+      - "Load skills/alice-weekly-report: same ten ## headings as daily"
+      - "REQUIRED Alice own ## Session summary after Header"
+      - "Cite four Market insights (prefer) + Session summaries or miss+reason"
+      - "REQUIRED ## Macro view (~1 page); GICS 11 and crash-indicator inside Macro view; no top-level §3.3"
+      - "no second full specialist paste"
+      - "Train: Alice draft → Zoe → Alice revise (reviser = alice only)"
+      - "Absolute inbox: $REPORTS_INBOX/weekly-deep-dive/ — never ~/.hermes/shared/inbox/"
+
+gate_and_revise:
+  - id: per_car_zoe
+    note: "Inside each car: draft → Zoe → owner revise (reviser_map). Zoe never writes *-revised.md."
+  - id: car5_overall_gate
+    assignee: zoe
+    then_reviser: alice
+    notes:
+      - "Cross-cutting checks Z-XC-01…08 + Z-MI-01…04 apply (no blended leaderboard / scores)"
+
+when_not_to_run:
+  - id: holiday_skip
+    stub: true
+    reason: "Market holiday week — owner may skip or mark miss; do not invent width/T&M packs"
+  - id: adx_verify_fail
+    stub: true
+    reason: "verify_weekly_adx fail-closed — do not LLM-correct ADX / ATR%"
+  - id: recreate_split_clocks
+    stub: true
+    reason: "Do not recreate deleted 11:00/11:20 split clocks; do not resume absorbed width/Alice standalone clocks"
+  - id: option_g_on_weekly
+    stub: true
+    reason: "Weekly T&M must not apply Option G BUY suppress"
+
+reviser_map:
+  car1_rates: christina
+  car2_commodities: emily
+  car3_tm_weekly: renee
+  car4_width: eliza
+  car5_overall: alice
+  zoe: null
+
+references:
+  contracts: docs/desk-artifact-contracts.md
+  profiles: docs/PROFILES.md
+  live_ops_catalog: docs/cron-jobs.md
+  sat_sun_fixes: docs/SAT-SUN-FIXES.md

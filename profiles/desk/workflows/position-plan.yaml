@@ -1,0 +1,40 @@
+# =============================================================================
+# DOCUMENTATION WORKFLOW — Hermes refine only
+# Not live host cron. Not auto-executing. Not Helios app.
+# =============================================================================
+
+name: position-plan
+kind: documentation_workflow
+status: draft_refine
+cadence_label: "On owner add: position-watch comment"
+schedule_note: "No clock. Owner states ticker plus LONG or SHORT. Not a cron."
+
+purpose: >
+  Alice names assignees. Sarah kanban_create only those names.
+  The comment is appended to that day's position-watch ## Position comments.
+  The script keeps that section when it rewrites the same file.
+
+hard_rules:
+  - E5_no_blend
+  - broker_quarantine
+  - no_journal_write
+  - no_new_report_file
+
+routes:
+  - id: stock_short
+    when: owner says short-term and Alice calls it a stock
+    lead: renee
+    contrast: eliza
+    contrast_depth: full value analysis in Eliza role
+  - id: stock_long
+    when: owner says long-term and Alice calls it a stock
+    lead: eliza
+    contrast: renee
+    contrast_depth: full trend analysis in Renee role
+  - id: claim
+    when: not a stock
+    claimers: [christina, emily]
+    on_conflict: ask owner
+
+artifact: inbox/position-watch/YYYY-MM-DD-position-watch.md
+section: "## Position comments"
