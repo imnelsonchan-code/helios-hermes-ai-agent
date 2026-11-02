@@ -1,0 +1,35 @@
+# Headless Chrome for Hermes browser tools.
+# Set TOKEN to a long random string; put the same value in Hermes browser config.
+services:
+  browserless:
+    image: browserless/chrome:latest
+    container_name: browserless
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9222:3000"
+    environment:
+      - CONNECTION_TIMEOUT=600000
+      - MAX_TIMEOUT=300000
+      - MAX_CONCURRENT_SESSIONS=1
+      - MAX_QUEUE_LENGTH=20
+      - PREBOOT_CHROME=true
+      - WORKSPACE_CLEANUP=true
+      - CHROME_FLAGS=--no-sandbox,--disable-dev-shm-usage,--disable-gpu,--disable-software-rasterizer
+      - FUNCTION_ENABLE_0=true
+      - SCREENSHOT_ENABLE_0=true
+      - HEALTH_ENDPOINTS=true
+      - TOKEN=${BROWSERLESS_TOKEN:?set BROWSERLESS_TOKEN}
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS -o /dev/null \"http://localhost:3000/metrics?token=$${TOKEN}\" || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s

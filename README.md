@@ -1,73 +1,84 @@
-# Hermes finance desk (public)
+# Helios @ Hermes AI Agent
 
-Research and operations tooling for a multi-specialist **investment desk** running on Hermes agents: trend/momentum (P-TM), value/width (P-VAL), rates, commodities, and macro integration. This repository is a **scrubbed, English-facing** snapshot of host scripts, profile docs, and desk contracts suitable for public review.
+Multi-specialist **investment desk** for [Hermes](https://github.com/): trend/momentum (P-TM), value/width (P-VAL), rates, commodities, macro integrate, plus Docker templates for reports portal, memory (OpenViking), web search, browserless, and crawl.
 
-**Not investment advice.** Scripts read journals and market data; they do not place broker orders unless explicitly wired on a private host.
+**Not investment advice.** Scripts read journals and market data; they do not place broker orders unless you wire that on your host.
+
+## Install path (short)
+
+```text
+1. Hermes already installed
+2. Bring up web-infra Docker (reports, OpenViking, SearXNG, Browserless, Crawl4AI)
+3. Copy .env.example → .env ; set keys
+4. Copy profiles + scripts/host → $HERMES_HOME
+5. Seed cron from docs/cron-catalog.md
+6. Smoke: pytest, portal /reports/, memory sync, chat
+```
+
+Full guide: **[`docs/INSTALL.md`](docs/INSTALL.md)**
 
 ## Audience / prerequisites
 
-- **Requires an existing Hermes host** if you want to apply profiles or run host scripts.
-- This repo **does not install Hermes**, OpenViking, Telegram, or model providers.
-- Clone → read docs / run unit tests works offline. Live apply / cron / chat stay on your private ops tooling.
+- Requires an **existing Hermes** host (this repo does not bootstrap the gateway).
+- Docker Compose for [`web-infra/`](web-infra/).
+- Secrets stay in `.env` / `ov.conf` — never commit them.
 
 ## What is included vs private
 
-| Included here | Stays private |
-|---------------|---------------|
-| Desk docs, SOUL/skills drafts, workflow YAML | Host-control CLI, apply-to-live scripts |
-| `scripts/host/` finance tooling + prompt SSOT | Live cron UUIDs, `.env`, API keys, chat IDs |
-| Synthetic pytest fixtures + profile audits | Non-finance skills, live holdings, ops runbooks |
+| Included here | Stays on your host only |
+|---------------|-------------------------|
+| Desk docs, SOUL/skills, workflow YAML | Live cron UUIDs / `jobs.json` |
+| `scripts/host/` finance + sync helpers | Real API keys, Telegram chat IDs |
+| `web-infra/` Compose **templates** | Filled `ov.conf` / service `.env` |
+| Semantic cron catalog | Foreign host job IDs |
+| Synthetic pytest fixtures | Live holdings |
 
 ## Layout
 
 | Path | Purpose |
 |------|---------|
-| `docs/` | Desk contracts, scoring overlays, SL/TP audit, profiles, glossary, failover concept |
-| `profiles/` | Agent SOUL drafts, skills checklists, desk workflow YAML (documentation) |
-| `scripts/host/` | Maintained Python/shell pool (T&M generator, position watch, risk plan, desk pack prompts) |
-| `scripts/tests/` | Unit tests (synthetic fixtures only in named test modules) |
+| [`docs/INSTALL.md`](docs/INSTALL.md) | End-to-end install |
+| [`docs/cron-catalog.md`](docs/cron-catalog.md) | Schedule jobs (semantic) |
+| [`docs/MEMORY.md`](docs/MEMORY.md) | OpenViking memory sync |
+| [`web-infra/`](web-infra/) | Docker templates (portal, OV, search, browser, crawl, OmniRoute) |
+| `docs/` | Desk contracts, scoring, SL/TP, profiles, glossary |
+| `profiles/` | Alice, Christina, Emily, Eliza, Renee, Zoe + desk workflows |
+| `scripts/host/` | T&M, risk, desk-pack prompts, portal/memory sync |
+| `scripts/tests/` | Unit tests (synthetic fixtures) |
+| [`fixtures/cron-catalog.yaml`](fixtures/cron-catalog.yaml) | Machine-readable cron catalog |
+
+## Architecture
+
+```text
+Docker: OpenViking · SearXNG · Browserless · Crawl4AI · reports-server
+                │
+Hermes cron (Sarah) → Kanban specialists → Zoe IC gate → *-revised.md
+                │                              │
+         sync_memory_to_ov              sync_reports_www → /reports/
+```
+
+E5: never blend P-TM (`tm_score`) and P-VAL (`valuation_score`).
 
 ## Key docs
 
-- [`docs/PROFILES.md`](docs/PROFILES.md) — who drafts and who revises after IC gate
-- [`docs/desk-artifact-contracts.md`](docs/desk-artifact-contracts.md) — artifact IDs and E5 rules
-- [`docs/SCORING-ENHANCEMENTS.md`](docs/SCORING-ENHANCEMENTS.md) — eval overlays vs live engines
-- [`docs/SL-TP-AUDIT.md`](docs/SL-TP-AUDIT.md) — stop/target audit and Telegram policy
-- [`docs/failover-concept.md`](docs/failover-concept.md) — per-profile model failover (vendor-neutral)
-- [`docs/glossary.md`](docs/glossary.md) — desk terminology
-- [`docs/APPLY.md`](docs/APPLY.md) — short apply *hints* for an existing host (no bootstrap)
-
-## Architecture (one flow)
-
-```text
-Desk Pack cadence → specialist Draft → Zoe IC gate → owner *-revised.md → inbox / portal
-```
-
-W-D1 daily / Sunday weekly / Saturday S1 — see `docs/PROFILES.md`. E5: never blend P-TM and P-VAL scores.
+- [`docs/INSTALL.md`](docs/INSTALL.md) — install
+- [`docs/PROFILES.md`](docs/PROFILES.md) — who drafts / revises
+- [`docs/desk-artifact-contracts.md`](docs/desk-artifact-contracts.md) — artifact IDs
+- [`docs/cron-catalog.md`](docs/cron-catalog.md) — schedules
+- [`docs/MEMORY.md`](docs/MEMORY.md) — memory
+- [`docs/failover-concept.md`](docs/failover-concept.md) — model failover (vendor-neutral)
+- [`docs/APPLY.md`](docs/APPLY.md) — profile apply hints
 
 ## Tests
-
-Optional venv with pytest:
 
 ```bash
 python3 -m pip install pytest   # if needed
 python3 -m pytest scripts/tests -q
-```
-
-Profile audits (static, no network):
-
-```bash
 ./scripts/run-equity-sleeve-audits.sh
 ./profiles/desk/tests/run_desk_audit.sh
 ```
 
-Fixtures use synthetic symbols `TST1.L`, `ACME`, `BETA` and note `Synthetic buy` where applicable.
-
-## Deploy (high level, existing Hermes only)
-
-1. Copy or sync `scripts/host/*` into your host script pool.
-2. Apply profile SOUL/skills with your private apply path (`docs/APPLY.md` is hints only).
-3. Keep live cron IDs and secrets on the host — never commit them here.
+Fixtures use synthetic symbols `TST1.L`, `ACME`, `BETA`.
 
 ## License
 

@@ -1,0 +1,98 @@
+# Semantic cron catalog for Helios @ Hermes AI Agent.
+# Create jobs on YOUR host — do not invent foreign 12-hex IDs.
+version: 1
+timezone: UTC
+
+always_on:
+  - id: kanban-blocked-monitor
+    schedule: "*/5 * * * *"
+    kind: no_agent
+    summary: Alert on newly blocked Kanban tasks
+  - id: portal-sync-www
+    schedule: "*/30 * * * *"
+    kind: no_agent
+    script: sync_reports_www.sh
+  - id: memory-sync-ov
+    schedule: "*/30 * * * *"
+    kind: no_agent
+    script: sync_memory_ov_cron.sh
+  - id: weight-config-watchdog
+    schedule: "*/30 * * * *"
+    kind: no_agent
+    summary: Restore Renee weight JSON if missing/corrupt
+
+weekday:
+  - id: desk-rank-nous
+    schedule: "0 5 * * *"
+    kind: no_agent
+    summary: Optional Nous free catalog / MoA pin
+  - id: social-watcher
+    schedule: "30 20 * * 1-6"
+    kind: agent
+    orchestrator: sarah
+    worker: alice
+    artifact: social-watch/*-snapshot.md
+  - id: fedwatch-fetch
+    schedule: "15 21 * * 1-5"
+    kind: no_agent
+    summary: FedWatch mirror; christina consume-only
+  - id: desk-pack-daily
+    schedule: "25 21 * * 1-5"
+    kind: agent
+    orchestrator: sarah
+    summary: W1 rates||tm then W2 commodities||value then Alice; terminal daily_tm_with_exits.sh
+    prompts: desk_pack_daily_train_prompts.py
+  - id: position-risk-train
+    schedule: "0 23 * * 1-5"
+    kind: no_agent
+    summary: Kelly / DD / position_watch
+  - id: coverage-watchdog
+    schedule: "35 23 * * 1-5"
+    kind: no_agent
+  - id: scoring-eval-daily
+    schedule: "59 23 * * 1-5"
+    kind: no_agent
+    script: scoring_eval_daily.py
+
+weekend:
+  - id: coverage-weekly
+    schedule: "0 11 * * 6"
+    kind: no_agent
+  - id: zoe-tracker
+    schedule: "15 11 * * 6"
+    kind: no_agent
+    script: zoe_tracker.sh
+  - id: saturday-self-review-s1
+    schedule: "0 12 * * 6"
+    kind: agent
+    prompts: saturday_self_review_prompts.py
+  - id: desk-pack-weekly
+    schedule: "0 12 * * 0"
+    kind: agent
+    summary: christina then emily then weekly TM then width then Alice
+    prompts: desk_pack_weekly_prompts.py
+  - id: journal-integrity
+    schedule: "0 18 * * 0"
+    kind: no_agent
+  - id: valuation-wow
+    schedule: "30 18 * * 0"
+    kind: no_agent
+    script: validate_wow_diff.sh
+  - id: scoring-ic-weekly
+    schedule: "0 19 * * 0"
+    kind: no_agent
+  - id: a08-monday-followup
+    schedule: "15 10 * * 1"
+    kind: agent
+    worker: eliza
+  - id: form4-monitor
+    schedule: "0 9 * * 0"
+    kind: agent
+    worker: eliza
+
+optional_paused:
+  - id: sec-monitor-weekday
+    schedule: "0 14 * * 1-5"
+    kind: agent
+    worker: eliza
+    note: Often paused; Sunday Form4 stays

@@ -1,0 +1,27 @@
+# SearXNG for Hermes web_search. Generate SEARXNG_SECRET_KEY locally.
+# Drop a settings.yml into ./searxng/ (see searxng/settings.yml.example).
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    ports:
+      - "127.0.0.1:8888:8080"
+    volumes:
+      - ./searxng:/etc/searxng:rw
+      - ./searxng-cache:/var/cache/searxng
+    environment:
+      - SEARXNG_BASE_URL=http://127.0.0.1:8888/
+      - SEARXNG_SECRET_KEY=${SEARXNG_SECRET_KEY:?set SEARXNG_SECRET_KEY}
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

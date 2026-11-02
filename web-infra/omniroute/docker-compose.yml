@@ -1,0 +1,56 @@
+# OmniRoute self-host stack for Hermes host ~/web-infra/omniroute/
+# Folder bind mounts only (no named volumes).
+# Internal-network bind: APP_BIND_HOST=0.0.0.0 (other LAN servers OK).
+# Pin image tag for GitOps; bump deliberately when refreshing free-catalog baseline.
+#
+# Usage on host:
+#   cd ~/web-infra/omniroute && docker compose up -d
+# Deploy from this repo:
+#   ./scripts/apply-omniroute.sh [--dry-run]
+
+services:
+  redis:
+    image: docker.io/library/redis:8.6.5-alpine
+    container_name: omniroute-redis
+    restart: unless-stopped
+    # No host publish — app reaches redis:6379 on the compose network.
+    volumes:
+      - ./redis-data:/data
+    command: redis-server --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  omniroute:
+    # Pin SemVer. If amd64 pulls look wrong, prefer digest pin in README.
+    image: diegosouzapw/omniroute:3.8.51
+    container_name: omniroute
+    restart: unless-stopped
+    stop_grace_period: 40s
+    env_file: .env
+    environment:
+      - DATA_DIR=/app/data
+      - REDIS_URL=redis://redis:6379
+      - PORT=${DASHBOARD_PORT:-20128}
+      - DASHBOARD_PORT=${DASHBOARD_PORT:-20128}
+      - API_PORT=${API_PORT:-20129}
+      - LIVE_WS_PORT=${LIVE_WS_PORT:-20132}
+      - NODE_OPTIONS=--max-old-space-size=${OMNIROUTE_MEMORY_MB:-2048}
+      - RADAR_ENABLED=${RADAR_ENABLED:-true}
+    ports:
+      - "${APP_BIND_HOST:-0.0.0.0}:${DASHBOARD_PORT:-20128}:${DASHBOARD_PORT:-20128}"
+      - "${APP_BIND_HOST:-0.0.0.0}:${API_PORT:-20129}:${API_PORT:-20129}"
+      - "${APP_BIND_HOST:-0.0.0.0}:${LIVE_WS_PORT:-20132}:${LIVE_WS_PORT:-20132}"
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.mjs"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

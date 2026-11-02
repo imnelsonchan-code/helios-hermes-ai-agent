@@ -1,0 +1,22 @@
+# OpenViking memory + KB (loopback only).
+# 1. Copy ov.conf.example → ov.conf and fill keys + root_api_key
+# 2. mkdir -p data
+# 3. docker compose up -d
+services:
+  openviking:
+    image: ghcr.io/volcengine/openviking:latest
+    container_name: openviking
+    ports:
+      - "127.0.0.1:1933:1933"
+    volumes:
+      - ./ov.conf:/app/.openviking/ov.conf
+      - ./data:/var/lib/openviking/workspace
+    environment:
+      OPENVIKING_PUBLIC_BASE_URL: ${OPENVIKING_PUBLIC_BASE_URL:-}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:1933/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped

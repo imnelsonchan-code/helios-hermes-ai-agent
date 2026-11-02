@@ -1,6 +1,13 @@
-# Cron jobs (public snapshot)
+# Cron jobs (concepts)
 
-This document summarizes desk cron concepts for the scrubbed public repo. Live job IDs live on the Hermes host only.
+Desk schedule **concepts** for this install pack. For the full semantic catalog
+(schedules, owners, scripts), use:
+
+- [`cron-catalog.md`](cron-catalog.md)
+- [`fixtures/cron-catalog.yaml`](../fixtures/cron-catalog.yaml)
+- Install path: [`INSTALL.md`](INSTALL.md)
+
+Live job IDs are **host-local**. Never commit foreign 12-hex cron UUIDs.
 
 ## Social watcher (Mon–Sat)
 
@@ -18,3 +25,11 @@ This document summarizes desk cron concepts for the scrubbed public repo. Live j
 ## FedWatch mirror (christina consume-only)
 
 - Host cron artifact `<job-id>` — christina **consume-only**; see `profiles/christina/skills/fedwatch-consume`.
+
+## Desk Pack trains
+
+- **Daily (Mon–Fri):** one Sarah job — Wave1 christina ∥ renee → Wave2 emily ∥ eliza → Alice → `daily_tm_with_exits.sh`.
+- **Weekly (Sun):** one Sarah job — christina → emily → weekly T&M → width → Alice.
+- **Saturday S1:** serial self-review; portal = Alice overall.
+
+See workflow YAML under `profiles/desk/workflows/` and prompt modules under `scripts/host/desk_pack_*.py`.
