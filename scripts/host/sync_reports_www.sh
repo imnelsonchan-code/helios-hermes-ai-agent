@@ -153,7 +153,16 @@ for dir in "$SRC"/*/; do
     rel="${f#"$dir"}"
     dest_file="$DST/$dest_name/$rel"
     mkdir -p "$(dirname "$dest_file")"
-    cp -u "$f" "$dest_file"
+    # Stage-then-rename: `cp` straight into www truncates the destination
+    # mid-copy, so nginx can briefly serve a half-written report.
+    staging="$dest_file.part.$$"
+    if cp "$f" "$staging" 2>/dev/null; then
+      mv -f "$staging" "$dest_file"
+    else
+      rm -f "$staging" 2>/dev/null
+      echo "[warn] copy failed: $src_name/$rel" >&2
+      continue
+    fi
   done
 done
 
@@ -172,11 +181,18 @@ for dest_name in $REVISE_TRAINS; do
   done
 done
 
-# Root-level notes (not the dashboard)
+# Root-level notes (not the dashboard) — same stage-then-rename discipline.
 for f in "$SRC"/*.md; do
   [ -f "$f" ] || continue
   is_publishable "$f" || continue
-  cp -u "$f" "$DST/"
+  base=$(basename "$f")
+  staging="$DST/.${base}.part.$$"
+  if cp "$f" "$staging" 2>/dev/null; then
+    mv -f "$staging" "$DST/$base"
+  else
+    rm -f "$staging" 2>/dev/null
+    echo "[warn] copy failed: root/$base" >&2
+  fi
 done
 
 # ── Step 2: move leftover www dirs that are not canonical / today ──
@@ -198,6 +214,8 @@ done
 
 # ── Step 3: today/ symlinks (today + yesterday in filename) ──
 echo "[today] rebuild symlinks"
+# Remove stage leftovers from an interrupted prior run before indexing.
+find "$DST" -type f -name "*.part.*" -delete 2>/dev/null || true
 find "$DST/today" -maxdepth 1 -type l -delete 2>/dev/null || true
 find "$DST" -maxdepth 3 -type f \( -name "*.md" -o -name "*.html" -o -name "*.json" \) | while read -r f; do
   [ -L "$f" ] && continue
@@ -248,13 +266,14 @@ INDEXEOF
 </body>
 </html>
 ENDHTML
-} > "$DST/today/index.html"
+} > "$DST/.today-index.part.$$"
+mv -f "$DST/.today-index.part.$$" "$DST/today/index.html"
 
 # ── Step 5: prune old dated files → archive ──
 echo "[prune] daily >7d, weekly >8 ISO weeks"
-CURRENT_WEEK=$(date +%V)
-CURRENT_YEAR=$(date +%Y)
-WEEK_CUTOFF=$((10#$CURRENT_WEEK - 8))
+# `date +%G-W%V` yields the ISO year-week; the old `#week - 8` arithmetic
+# archived EVERY prior-year weekly in January regardless of age.
+WEEK_CUTOFF="$(date -d '-8 weeks' +%G-W%V)"
 
 find "$DST" -maxdepth 3 -type f \( -name "*.md" -o -name "*.html" -o -name "*.json" \) | while read -r f; do
   [ -L "$f" ] && continue
@@ -263,9 +282,8 @@ find "$DST" -maxdepth 3 -type f \( -name "*.md" -o -name "*.html" -o -name "*.js
 
   week=$(echo "$fname" | grep -oE '[0-9]{4}-W[0-9]{2}' | head -1)
   if [ -n "$week" ]; then
-    wy=${week:0:4}
-    ww=$((10#${week:6:2}))
-    if [ "$wy" -lt "$CURRENT_YEAR" ] || { [ "$wy" -eq "$CURRENT_YEAR" ] && [ "$ww" -lt "$WEEK_CUTOFF" ]; }; then
+    # ISO week-string lexicographic compare (assumes uniform %G-W%V format).
+    if [[ "$week" < "$WEEK_CUTOFF" ]]; then
       rel="${f#"$DST/"}"
       mkdir -p "$(dirname "$ARCHIVE/$rel")"
       mv "$f" "$ARCHIVE/$rel" 2>/dev/null || true
@@ -311,10 +329,14 @@ if [[ -f "$TPL" ]]; then
   STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   python3 - "$TPL" "$DST/index.html" "$STAMP" <<'PY'
 from pathlib import Path
+import os
 import sys
 src, dest, stamp = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
 text = src.read_text(encoding="utf-8").replace("__SYNC_STAMP__", stamp)
-dest.write_text(text, encoding="utf-8")
+# Stage-then-rename: never publish a half-written dashboard.
+tmp = dest.with_name(f".index.html.part.{os.getpid()}")
+tmp.write_text(text, encoding="utf-8")
+os.replace(tmp, dest)
 print(f"[index] portal written stamp={stamp}")
 PY
 else

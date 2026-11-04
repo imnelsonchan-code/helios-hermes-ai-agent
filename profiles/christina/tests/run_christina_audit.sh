@@ -98,15 +98,17 @@ for ch in chunks:
     if short_re.search(flat):
         sys.exit(0)
 
-# Whole-doc fallback: tokens in order (first hit after previous), trunk after fx
+# Whole-doc fallback: long skill-folder tokens in order (first hit after
+# previous), trunk after fx. Generic standalone words ("curve", "real", "fx")
+# appear constantly in prose and made this fallback near-vacuous — keep only
+# the folder names so a mangled load order can actually fail here.
 flat = normalize(text)
-# If hint given, still replace this skill globally for order scan of load snippets
 token_pats = [
-    r"curve-watch|\bcurve\b",
-    r"real-rates|\breal\b",
-    r"fedwatch-consume|\bfedwatch\b",
-    r"bond-etf-tape|\bbond-etf\b",
-    r"fx-us-uk-bridge|\bfx\b",
+    r"curve-watch",
+    r"real-rates",
+    r"fedwatch-consume",
+    r"bond-etf-tape",
+    r"fx-us-uk-bridge",
 ]
 idx = -1
 for pat in token_pats:

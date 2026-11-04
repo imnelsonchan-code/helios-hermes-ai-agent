@@ -379,5 +379,101 @@ class TestPortfolioTracker(unittest.TestCase):
         tg.assert_not_called()
 
 
+# ── Native-fill price resolution (Price USD / Total USD / Price) ──
+
+def _juice_gbp_row() -> dict:
+    return _row("ACME", "BUY", "OPEN", 100, 249.40, gbp_amount=24940.00)
+
+
+class TestNativeFillResolution(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.mod = _load_tracker()
+
+    def test_usd_stale_price_resolves_from_price_usd(self):
+        """Live USD rows carry a stale GBP-space `Price`; `Price USD` wins."""
+        row = _row("ACME", "BUY", "CLOSED", 100, 249.40, total_usd=33632.00)
+        row["Price USD"] = "336.32"
+        pnl = self.mod.compute_pnl([row], gbp_usd_rate=GBP_USD_RATE)
+        acme = pnl["ACME"]
+        self.assertAlmostEqual(acme["entry_price"], 336.32, places=2)
+        self.assertEqual(acme["native_ccy"], "USD")
+
+        # A SELL at Cost = entry must come out as a break-even trade, not the
+        # +34.85% fabricated from 249.40 in the pre-fix build.
+        sell = _row("ACME", "SELL", "CLOSED", 100, 249.40, total_usd=33632.00)
+        sell["Price USD"] = "336.32"
+        pnl = self.mod.compute_pnl([row, sell], gbp_usd_rate=GBP_USD_RATE)
+        self.assertAlmostEqual(pnl["ACME"]["pnl_usd"], 0.0, delta=0.02)
+        self.assertAlmostEqual(pnl["ACME"]["pnl_pct"], 0.0, delta=0.02)
+
+    def test_usd_fill_without_price_usd_uses_total_div_shares(self):
+        row = _row("ACME", "BUY", "CLOSED", 10, 249.40, total_usd=3363.20)
+        pnl = self.mod.compute_pnl([row], gbp_usd_rate=GBP_USD_RATE)
+        self.assertAlmostEqual(pnl["ACME"]["entry_price"], 336.32, places=3)
+
+    def test_unusable_price_usd_falls_back_to_total_div_shares(self):
+        """`Price USD` present but nonpositive ("0"/junk) must not drop the row."""
+        row = _row("ACME", "BUY", "CLOSED", 10, 249.40, total_usd=3363.20)
+        row["Price USD"] = "0"
+        pnl = self.mod.compute_pnl([row], gbp_usd_rate=GBP_USD_RATE)
+        acme = pnl["ACME"]
+        self.assertAlmostEqual(acme["entry_price"], 336.32, places=3)
+        self.assertEqual(acme["native_ccy"], "USD")
+        self.assertEqual(acme.get("unresolved_rows", 0), 0)
+
+    def test_gbp_row_still_uses_price(self):
+        row = _juice_gbp_row()
+        pnl = self.mod.compute_pnl([row], gbp_usd_rate=GBP_USD_RATE)
+        self.assertAlmostEqual(pnl["ACME"]["entry_price"], 249.40, places=4)
+        self.assertEqual(pnl["ACME"]["native_ccy"], "GBP")
+
+    def test_mixed_currency_ticker_is_flagged_not_blended(self):
+        gbp_buy = _juice_gbp_row()
+        usd_sell = _row("ACME", "SELL", "CLOSED", 100, 0.0, total_usd=33632.00)
+        usd_sell["Price USD"] = "336.32"
+        pnl = self.mod.compute_pnl([gbp_buy, usd_sell], gbp_usd_rate=GBP_USD_RATE)
+        acme = pnl["ACME"]
+        self.assertTrue(acme["mixed_ccy"])
+        self.assertEqual(acme["native_ccy"], "MIXED")
+
+    def test_mixed_currency_requires_positive_rate(self):
+        gbp_buy = _juice_gbp_row()
+        usd_sell = _row("ACME", "SELL", "CLOSED", 100, 0.0, total_usd=33632.00)
+        usd_sell["Price USD"] = "336.32"
+        with self.assertRaises(ValueError):
+            self.mod.compute_pnl([gbp_buy, usd_sell], gbp_usd_rate=0.0)
+
+    def test_unresolvable_row_excluded_and_counted(self):
+        # USD fill with neither Price USD nor shares → unresolvable.
+        bad = _row("ACME", "BUY", "CLOSED", 100, 249.40, total_usd=33632.00)
+        bad["Price USD"] = "0"
+        del bad["Shares"]
+        bad["Shares"] = ""  # no shares -> Total USD cannot be divided
+        pnl = self.mod.compute_pnl([bad], gbp_usd_rate=GBP_USD_RATE)
+        acme = pnl["ACME"]
+        self.assertEqual(acme["unresolved_rows"], 1)
+        self.assertEqual(acme["buy_shares"], 0)
+        self.assertAlmostEqual(acme["entry_price"], 0.0, places=6)
+
+    def test_fixture_rows_have_no_data_quality_flags(self):
+        pnl = self.mod.compute_pnl(FIXTURE_ROWS, gbp_usd_rate=GBP_USD_RATE)
+        for t, d in pnl.items():
+            self.assertFalse(d["mixed_ccy"], t)
+            self.assertEqual(d["unresolved_rows"], 0, t)
+
+    def test_report_includes_data_quality_warnings(self):
+        gbp_buy = _juice_gbp_row()
+        usd_sell = _row("ACME", "SELL", "CLOSED", 100, 0.0, total_usd=33632.00)
+        usd_sell["Price USD"] = "336.32"
+        pnl = self.mod.compute_pnl([gbp_buy, usd_sell], gbp_usd_rate=GBP_USD_RATE)
+        summary = self.mod.compute_portfolio_summary(pnl)
+        with tempfile.TemporaryDirectory() as td:
+            self.mod.REPORT_DIR = td
+            out = _call_write_report(self.mod, pnl, summary)
+        self.assertIn("Data-quality warnings", out)
+        self.assertIn("mixed GBP/USD", out)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -12,7 +12,8 @@ services:
       retries: 3
       start_period: 15s
     ports:
-      - "${REPORTS_BIND:-0.0.0.0}:8080:80"
+      # Loopback default (LAN exposure is opt-in — set REPORTS_BIND=0.0.0.0).
+      - "${REPORTS_BIND:-127.0.0.1}:8080:80"
     volumes:
       - ./www:/usr/share/nginx/html/reports:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro

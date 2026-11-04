@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """weekly_report_gen.py — W37+ weekly T&M report dataset + data-table generator.
 
-Generator-layer fix for the W36 Zoe REJECT (t_0386a1a6, follow-up
-t_f1230df9): the W35/W36 M1 (Risk%/ATR14% dual columns) and B1 (weekly SPY
+Generator-layer fix for the W36 Zoe REJECT (t_ticket, follow-up
+t_ticket): the W35/W36 M1 (Risk%/ATR14% dual columns) and B1 (weekly SPY
 ADX true-Wilder) fixes were only applied to the REPORT, so the generators
 could regress. This module is the durable code path for the W37+ weekly
 draft: dataset assembly (DB weekly_snapshots + shared daily cache) and the
@@ -23,7 +23,7 @@ WHAT IT PRODUCES
 KEY INVARIANTS (keep when editing)
   * ATR14: pure-Wilder RMA14; bars cleaned with dropna semantics equal to the
     daily pipeline calc_atr14_from_df (drop rows where Close/High/Low/Volume
-    is None or NaN) — QCOM/LIN/HD 2025-09-04 leading NaN stub must NOT poison.
+    is None or NaN) — a leading NaN stub week must NOT poison.
   * Risk%   = (Entry - SL) / Entry x 100      (stop distance)
   * ATR14%  = ATR14 / Close x 100             (true volatility)
   * SPY weekly ADX14: canonical true-Wilder on W-FRI weekly bars resampled
@@ -241,8 +241,8 @@ def build_dataset(week, cache_dir, out_path=None):
             missing_entry.append(t)
         else:
             entry_block = es
-            # Detect a leading NaN stub row that was dropped (QCOM/LIN/HD
-            # 2025-09-04 cache signature) so the report can disclose the fix.
+            # Detect a leading NaN stub row that was dropped (a known cache
+            # signature) so the report can disclose the fix.
             p = os.path.join(cache_dir, f"ohlcv_{t}.json")
             if os.path.exists(p):
                 try:

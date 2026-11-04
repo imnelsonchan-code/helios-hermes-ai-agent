@@ -115,6 +115,34 @@ class DeskPackDailyCompletionGateTests(unittest.TestCase):
         self.assertEqual(payload["exit_evidence"], "miss")
         self.assertEqual(payload["status"], "incomplete")
 
+    def test_failed_overlay_receipt_is_not_success_evidence(self):
+        """`status: checker_rc=3` = the overlay crashed; pack must be incomplete."""
+        self._write(f"market-close/{DATE}-summary-revised.md")
+        self._write(f"daily-social/{DATE}-summary-revised.md")
+        self._write(
+            f"desk-pack-exit/{DATE}-tm-exits.md",
+            "TM BUY digest body\n\nstatus: checker_rc=3\n",
+        )
+        buf = StringIO()
+        with redirect_stdout(buf):
+            code = self.mod.main(["--date", DATE])
+        self.assertEqual(code, 2)
+        payload = json.loads(buf.getvalue().strip())
+        self.assertEqual(payload["exit_evidence"], "failed-overlay")
+        self.assertEqual(payload["status"], "incomplete")
+
+    def test_healthy_receipt_statuses_still_ok(self):
+        body = "TM BUY digest body\n\nstatus: no-OPEN-skip\n"
+        self._write(f"market-close/{DATE}-summary-revised.md")
+        self._write(f"daily-social/{DATE}-summary-revised.md")
+        self._write(f"desk-pack-exit/{DATE}-tm-exits.md", body)
+        buf = StringIO()
+        with redirect_stdout(buf):
+            code = self.mod.main(["--date", DATE])
+        self.assertEqual(code, 0)
+        payload = json.loads(buf.getvalue().strip())
+        self.assertEqual(payload["exit_evidence"], "ok")
+
     def test_exit_receipt_fallback_same_dir(self):
         self._write(f"market-close/{DATE}-summary-revised.md")
         self._write(f"daily-social/{DATE}-summary-revised.md")

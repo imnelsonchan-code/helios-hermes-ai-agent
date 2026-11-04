@@ -61,7 +61,7 @@ def _rma(series, length):
 def _adx(high, low, close, length=14):
     """True-Wilder ADX(14) + DMP/DMN (RMA smoothing).
 
-    REFACTORED 2026-08-09 (t_3f881e2e, W32 B1 follow-up): previously used
+    REFACTORED 2026-08-09 (t_ticket, W32 B1 follow-up): previously used
     rolling-mean (SMA) smoothing, producing inflated ADX (SPY 25.2 on 08-07
     vs true-Wilder 22.1). Now matches pandas_ta ta.adx / verify_adx.py, so
     per-stock daily ADX is consistent with the weekly pandas_ta ADX(14).
@@ -100,7 +100,7 @@ def _adx(high, low, close, length=14):
 def _atr(high, low, close, length=14):
     """True-Wilder ATR(14) (RMA smoothing).
 
-    REFACTORED 2026-08-09 (t_40a88ab7): previously used SMA smoothing
+    REFACTORED 2026-08-09 (t_ticket): previously used SMA smoothing
     (tr.rolling(length).mean()), producing ATR14 divergence of -2.8% to +7.4%
     vs pandas_ta ta.atr (measured on 08-07 cache: SPY 9.131 vs 8.877, AAPL
     -4.2%, PANW +4.9%, JPM +6.5%). Now uses the same `_rma` helper as `_adx()`,
@@ -136,18 +136,18 @@ from score_engine import compute_all, get_signal_bracket, get_signal_verdict
 from daily_data_cache import get_vix, get_spy_adx, get_run_id, get_or_fetch_info, get_or_fetch_batch_ohlcv, CACHE_ROOT
 from pipeline_guard import guard_daily_report_generation, guard_report_generation
 
-# 1.0.1 (t_b5acc944, Zoe 09-01): market-close guard in freshness watchdog +
+# 1.0.1 (t_ticket, Zoe 09-01): market-close guard in freshness watchdog +
 # data.json float rounding (1/2/4dp key-aware) + rolling-WR live-resolve
 # breakdown footnote + RSI oversold design Signal Legend + --date/--note/
 # --refresh CLI for post-close regeneration.
-# 1.0.2 (t_7915ddcc, Zoe 09-02): technical_screen Rule 5 volatility-floor
+# 1.0.2 (t_ticket, Zoe 09-02): technical_screen Rule 5 volatility-floor
 # hysteresis (admit 2.0% / retain incumbent 1.8% — PFE 1.987% knife-edge
 # flicker) + screen-failure cause disclosure in the universe-change note +
 # near-miss/hysteresis notes + header label "Daily (Watchlist + Screen-Pass)"
 # with universe composition + single-stock material-move standard
 # (|1D%| >= 5.0%, ranking flag + Key Ticker Notes table) + gold header
 # explicit GC=F level / GLD 1D% reference labels.
-# 1.0.3 (t_8cd84165, Zoe 09-03 M1/m1/m2): 
+# 1.0.3 (t_ticket, Zoe 09-03 M1/m1/m2): 
 #   M1 (Option B — Renee methodology decision): T&M report ATR SL is a
 #     SEPARATE single-point-entry methodology (Entry = Close + 0.5×ATR14
 #     trigger; SL = Entry − 0.75×ATR14 = 0.75-ATR risk from the trigger point;
@@ -164,7 +164,7 @@ from pipeline_guard import guard_daily_report_generation, guard_report_generatio
 #     (GOLD_MATERIAL_MOVE_PCT = 1.5, symmetric with daily-social §9 trigger)
 #     and emitted into data.json + the gold header so readers see why GLD
 #     +1.85% flags while the equity universe uses |1D%| ≥ 5.0%.
-# 1.0.4 (t_94cfd4c8, Zoe 09-04 M1/m1/m3 — generator fixes):
+# 1.0.4 (t_ticket, Zoe 09-04 M1/m1/m3 — generator fixes):
 # M1: "" column RENAMED to "Adj" + Full Ranking header now
 #     auto-emits the methodology disclosure (source = this run's own scoring
 # results; window = non-rolling; update frequency = ;
@@ -180,7 +180,7 @@ from pipeline_guard import guard_daily_report_generation, guard_report_generatio
 #     flags — ⚠️ when scoreΔ direction opposes 1D% direction, and
 # [sub↔raw ] when the RSI sub-score delta opposes the raw RSI delta
 #     (non-monotonic RSI zone design) — plus an auto-emitted flag legend.
-# 1.0.5 (t_6ed3ff15, Zoe 09-07 M1): SAME-AS-OF 1D% prev-close lock.
+# 1.0.5 (t_ticket, Zoe 09-07 M1): SAME-AS-OF 1D% prev-close lock.
 #   Root cause: 09-07 (Labor Day holiday) re-fetch silently back-adjusted BAC
 #   history between fetches (Yahoo dividend/split adjustment: 09-03 close
 #   63.04 → 62.72 while the 09-04 as-of close stayed 62.68). calc_indicators
@@ -189,7 +189,7 @@ from pipeline_guard import guard_daily_report_generation, guard_report_generatio
 #   by re-fetch. Fix: when today's data-as-of equals the previous published
 #   report's data-as-of, the PUBLISHED row is canonical — 1D% is carried over
 #   VERBATIM (identical at every precision) while the as-of close is
-#   effectively unchanged (≤0.1% tolerance; BAC + 1-cent revisions like GILD
+#   effectively unchanged (≤0.1% tolerance; broker 1-cent close revisions like
 #   150.99→151.00); if the as-of close is materially revised, the published
 #   prior close (price / (1 + change_pct)) is locked and 1D% = close /
 #   locked_ref - 1. Re-fetch can never rewrite the reference again. Lock
@@ -219,7 +219,7 @@ BRACKET_WR_BACKTEST = {
                "note": "= live 50-59 + <50 merged (legacy 5-bucket)"},
 }
 BRACKET_WR_ORDER = [">='90'", "80-89", "70-79", "60-69", "<60"]
-# Live rolling-WR table brackets (t_c36bf49b W35 P0). Uses proper ">=90"
+# Live rolling-WR table brackets (t_ticket W35 P0). Uses proper ">=90"
 # (not the legacy ">='90'" typo) and splits <60 into 50-59 (WATCH) + <50
 # (NO_SIGNAL) so the live table matches weekly_snapshots signal_bracket values.
 LIVE_BRACKET_ORDER = [">=90", "80-89", "70-79", "60-69", "50-59", "<50"]
@@ -246,7 +246,7 @@ SECTOR_FALLBACK = {
 }
 
 
-# ── data.json float rounding (Zoe 09-01 m2, t_b5acc944) ──
+# ── data.json float rounding (Zoe 09-01 m2, t_ticket) ──
 # data.json has carried IEEE 754 residue since W27 (daily_score
 # 91.39999999999999, dgs10_bp 1.9999999999999574, spread_2s10
 # 41.000000000000014). Round every float before json.dump — but KEY-AWARE:
@@ -264,7 +264,7 @@ _ROUND_2DP_KEYS = {
     "diff", "dgs2", "dgs10", "dgs30", "dgs2_bp", "dgs10_bp", "dgs30_bp",
     "spread_2s10", "spread_change_bp", "gold_close", "gold_gld_close",
     "gold_gld_1d_pct", "macd_line", "macd_hist", "macd_signal", "volume_ratio",
-    # gold_context summary keys (Zoe 09-03 m2, t_8cd84165)
+    # gold_context summary keys (Zoe 09-03 m2, t_ticket)
     "gc_f_level", "gld_close", "gld_1d_pct", "material_threshold_pct",
 }
 _ROUND_4DP_KEYS = {"change_pct", "obv_pct_change", "avg_range_raw", "hysteresis_range_raw"}
@@ -322,7 +322,7 @@ ATR_ENTRY_OFFSET = 0.5
 ATR_TP_OFFSET = 1.5
 ATR_SL_OFFSET = 0.75
 
-# ── T&M ATR SL basis — Renee methodology decision (Zoe 09-03 M1, t_8cd84165) ──
+# ── T&M ATR SL basis — Renee methodology decision (Zoe 09-03 M1, t_ticket) ──
 # The T&M report's ATR ladder is a SINGLE-POINT-ENTRY methodology:
 #   Entry = Close + 0.5×ATR14  (breakout/momentum trigger ABOVE the close)
 #   SL    = Entry − 0.75×ATR14 (0.75-ATR risk measured from the trigger point)
@@ -330,7 +330,7 @@ ATR_SL_OFFSET = 0.75
 # Mathematically SL lands at Close − 0.25×ATR14, which COINCIDES with the
 # technical-snapshot "zone floor" level — but the trade construction is NOT
 # the technical-snapshot momentum setup (zone entry floor..ceiling, SL =
-# floor − 1×ATR14, R:R on zone-midpoint basis, t_d4dfd3b7). Re-anchoring this
+# floor − 1×ATR14, R:R on zone-midpoint basis, t_ticket). Re-anchoring this
 # ladder to Close − 1.25×ATR (Option A) would widen risk from the trigger to
 # 1.75×ATR while TP stays +1.5×ATR → R:R < 1 for every row, and a single-point
 # trigger has no "zone floor" to anchor to. DECISION = Option B: keep the
@@ -352,7 +352,7 @@ OPT = {
     "bb": {"period": 20, "std": 2},
 }
 
-# ── Rule 5 volatility-floor hysteresis (Zoe 09-02 challenge, t_7915ddcc) ──
+# ── Rule 5 volatility-floor hysteresis (Zoe 09-02 challenge, t_ticket) ──
 # PFE (09-01 #1, Adj 114.2) was silently dropped on 09-02 when its
 # 20-day mean daily range ticked from >= 2.0% to 1.987% — a 0.013pp
 # knife-edge (per-ticker-errors.jsonl 22:02:51). A single threshold for both
@@ -370,7 +370,7 @@ OPT = {
 RULE5_ADMIT_PCT = 2.0
 RULE5_KEEP_PCT = 1.8
 
-# ── Single-stock material-move flag standard (Zoe 09-02 m2, t_7915ddcc) ──
+# ── Single-stock material-move flag standard (Zoe 09-02 m2, t_ticket) ──
 # Gold's 🔴 material-move flag uses GLD |1D%| >= 1.5% (fetch_macro_context).
 # For individual stocks a 1.5% move is noise (typical |1D%| 0.5-3%), so the
 # single-stock standard is |1D%| >= 5.0% — PANW -9.28% / similar size moves.
@@ -378,7 +378,7 @@ RULE5_KEEP_PCT = 1.8
 # Notes material-move table so the two can never disagree.
 MATERIAL_MOVE_PCT = 5.0
 
-# ── Gold material-move threshold (Zoe 09-03 m2, t_8cd84165) ──
+# ── Gold material-move threshold (Zoe 09-03 m2, t_ticket) ──
 # Gold's 🔴 flag is gold-SPECIFIC: GLD |1D%| >= 1.5%, symmetric with the
 # daily-social §9 gold trigger. It is a DIFFERENT standard from the equity
 # universe MATERIAL_MOVE_PCT (5.0%) because a commodity ETF moves on a
@@ -435,7 +435,7 @@ def technical_screen(df, ticker="?", prev_member=False):
       2. Price > SMA50 > SMA200 (bullish alignment)
       3. 3-month return 10-40% (momentum, not too extended)
       4. Price within 5% of nearest 10/20/50 EMA (not stretched)
-      5. Avg daily range floor with hysteresis (Zoe 09-02, t_7915ddcc):
+      5. Avg daily range floor with hysteresis (Zoe 09-02, t_ticket):
              >= 2.0%  admit a NEW candidate (not in yesterday's universe)
              >= 1.8%  RETAIN an incumbent (yesterday's universe member)
          The two-threshold band stops knife-edge flicker (PFE 1.987% on
@@ -555,7 +555,7 @@ def technical_screen(df, ticker="?", prev_member=False):
         return result
 
     # Rule 5: Avg daily range floor — two-threshold hysteresis
-    # (Zoe 09-02 challenge, t_7915ddcc). The old single 2.0% threshold made
+    # (Zoe 09-02 challenge, t_ticket). The old single 2.0% threshold made
     # PFE (09-01 #1, Adj 114.2) silently vanish on 09-02 when its 20-day mean
     # daily range printed 1.987% — a 0.013pp knife-edge. Admission for NEW
     # candidates stays >= 2.0%; incumbents (yesterday's published universe)
@@ -787,7 +787,7 @@ def get_regime_daily():
     
     Returns (regime, spy_adx, vix_close).
 
-    08-11 Zoe BLOCKER (t_b18a2102) hardening: this function must NEVER
+    08-11 Zoe BLOCKER (t_ticket) hardening: this function must NEVER
     silently return regime="ranging"/ADX=0 on failure. The 08-11 first run
     swallowed a pandas_ta ImportError into ("ranging", 0, 0), which bypassed
     Option G (choppy-only suppression) and produced 19 false BUY signals.
@@ -839,7 +839,7 @@ def load_watchlist_tickers():
 
 
 # ══════════════════════════════════════════════════════════════════════
-# PREVIOUS-DAY BASELINE + RULE 5 HYSTERESIS MEMBERSHIP (Zoe 09-02, t_7915ddcc)
+# PREVIOUS-DAY BASELINE + RULE 5 HYSTERESIS MEMBERSHIP (Zoe 09-02, t_ticket)
 # ══════════════════════════════════════════════════════════════════════
 # The technical_screen Rule 5 hysteresis needs to know whether a candidate
 # was in YESTERDAY's PUBLISHED universe (previous {date}-data.json in
@@ -896,7 +896,7 @@ def load_prev_daily_report(prev_path):
         "scores": {}, "verdicts": {}, "breakdowns": {}, "raws": {},
         "brackets": dict(_BRACKET_ZERO), "buy_effective": 0,
         "tickers": set(), "ranked": [], "rank_index": {},
-        # 1.0.5 (t_6ed3ff15): expose the published row's data-as-of + per-ticker
+        # 1.0.5 (t_ticket): expose the published row's data-as-of + per-ticker
         # price and 1D% so the same-as-of prev-close lock (apply_same_asof_1d_lock)
         # can anchor on the PUBLISHED reference — a re-fetch can never rewrite
         # an already-published prior close (BAC 09-07 M1 regression).
@@ -959,7 +959,7 @@ def load_prev_daily_comparison(today_str):
         "scores": {}, "verdicts": {}, "breakdowns": {}, "raws": {},
         "brackets": dict(_BRACKET_ZERO), "buy_effective": 0,
         "tickers": set(), "ranked": [], "rank_index": {},
-        # 1.0.5 (t_6ed3ff15): same-as-of 1D% lock needs the prev report's
+        # 1.0.5 (t_ticket): same-as-of 1D% lock needs the prev report's
         # data-as-of + published row price/1D%. Empty in the weekly fallback.
         "as_of": "", "row_close": {}, "row_chg": {},
     }
@@ -1014,7 +1014,7 @@ def published_prior_close(price, change_pct):
     change_pct = price / prior_close - 1. Inverting gives the prior close the
     row was anchored to at PUBLICATION time.
 
-    1.0.5 (t_6ed3ff15, Zoe 09-07 M1): this is the value the same-as-of 1D%
+    1.0.5 (t_ticket, Zoe 09-07 M1): this is the value the same-as-of 1D%
     lock treats as canonical. A later yfinance re-fetch can silently
     back-adjust history (dividend/split scaling — BAC 09-03 close rewritten
     63.04 → 62.72 between the 09-04 and 09-07 fetches), which would otherwise
@@ -1038,7 +1038,7 @@ def apply_same_asof_1d_lock(results, prev_row_close, prev_row_chg,
                             close_tol_rel=0.001):
     """Lock 1D% to the PUBLISHED row when data-as-of is unchanged.
 
-    Zoe 09-07 M1 (t_6ed3ff15): on a holiday / weekend / same-day re-run the
+    Zoe 09-07 M1 (t_ticket): on a holiday / weekend / same-day re-run the
     current data-as-of equals the previous published report's data-as-of, so
     every published 1D% must stay identical (31/31 re-verify vs the 09-04
     report). calc_indicators derives 1D% from the fetched df's last two bars;
@@ -1053,7 +1053,7 @@ def apply_same_asof_1d_lock(results, prev_row_close, prev_row_chg,
         close_tol_rel, default 0.1%): 1D% = PUBLISHED change_pct VERBATIM.
         This reproduces the published table exactly (4dp round-trip), so a
         re-fetch can never rewrite an already-published number — even a tiny
-        close revision (GILD 150.99 -> 151.00, 1 cent) must not drift the
+        close revision (e.g. 150.99 -> 151.00, 1 cent) must not drift the
         published cell.
       - as-of close materially revised (correction beyond tolerance): the
         PUBLISHED prior close reference is locked (price / (1 + change_pct))
@@ -1156,7 +1156,7 @@ def compute_entry_sl_tp(price, atr14, regime=None):
     - volatile:  SL tightened from 0.75×ATR to 0.5×ATR (tighter risk)
     - trending:  TP loosened from 1.5×ATR to 2.0×ATR (let winners run)
 
-    SL BASIS (Renee methodology decision, Zoe 09-03 M1 / t_8cd84165):
+    SL BASIS (Renee methodology decision, Zoe 09-03 M1 / t_ticket):
     This ladder is a SINGLE-POINT-ENTRY construction — the SL is measured
     0.75×ATR from the single trigger entry (Close + 0.5×ATR), i.e. it lands
     at Close − 0.25×ATR. It is NOT the technical-snapshot momentum-setup
@@ -1267,7 +1267,7 @@ def log_ticker_error(ticker, step, error_type, message="", raw_snapshot=None):
         pass  # don't let error-logging itself crash the pipeline
 
 
-# ── Verify-after-write helper (t_5034ab16 W33) ──
+# ── Verify-after-write helper (t_ticket W33) ──
 def _verify_write(filepath, is_json=False, min_size=50):
     """Re-read a file after writing to confirm it was saved correctly.
     Returns True if the file exists, is >= min_size bytes, and (if is_json) is valid JSON.
@@ -1291,11 +1291,11 @@ def _verify_write(filepath, is_json=False, min_size=50):
 
 
 # ── Macro context: Treasury H.15 bond yields (same-day) + gold GC=F ──
-# P0-3 + P1-5 fix (t_1dacac8d): bond context must use the SAME trading day's
+# P0-3 + P1-5 fix (t_ticket): bond context must use the SAME trading day's
 # close (or be explicitly labeled T-1 with a reason); the gold reference
 # must use the LATEST GC=F close, never a stale value. Signal label is derived
 # from the actual bp move — a +5bp day is , never .
-# m1 fix (Zoe 09-03, t_8cd84165): the data source is Treasury.gov H.15 daily
+# m1 fix (Zoe 09-03, t_ticket): the data source is Treasury.gov H.15 daily
 # yield curve (fred_data.py fetches the Treasury XML), NOT FRED DGS2. FRED
 # DGS2 (rubric #77 canonical) republishes the SAME underlying series with a
 # T+1 business-day lag. The generator's out dict carries a "source" field so
@@ -1355,7 +1355,7 @@ def classify_bond_regime(dgs2_bp, dgs10_bp, dgs30_bp, spread_change_bp):
 def fetch_macro_context(today):
     """Fetch same-trading-day Treasury H.15 yields (2Y/10Y/30Y) via
     fred_data.py (Treasury.gov daily yield curve XML — m1 source fix
-    t_8cd84165: this is NOT FRED DGS2; FRED republishes the same series T+1)
+    t_ticket: this is NOT FRED DGS2; FRED republishes the same series T+1)
     and latest GC=F gold close + GLD 1D% via yfinance.
 
     Returns dict with keys: source, as_of, as_of_label, dgs2, dgs10, dgs30,
@@ -1386,7 +1386,7 @@ def fetch_macro_context(today):
         as_of = latest_date
         as_of_label = latest_date
         if as_of != today:
-            # m1 fix (Zoe 09-03, t_8cd84165): source is Treasury H.15, NOT FRED.
+            # m1 fix (Zoe 09-03, t_ticket): source is Treasury H.15, NOT FRED.
             as_of_label = (f"{latest_date} (T-1 — same-day Treasury H.15 not yet "
                            f"published at run time)")
 
@@ -1418,7 +1418,7 @@ def fetch_macro_context(today):
         regime_label, regime_zh, regime_signal = classify_bond_regime(
             dgs2_bp, dgs10_bp, dgs30_bp, spread_change_bp)
 
-        # m1 fix (Zoe 09-03, t_8cd84165): DGS2 prev-day lag reference. FRED DGS2
+        # m1 fix (Zoe 09-03, t_ticket): DGS2 prev-day lag reference. FRED DGS2
         # (rubric #77 canonical) and Treasury H.15 2Y are the SAME underlying
         # series; FRED republishes with a T+1 business-day lag. When the H.15
         # same-day record is available (as_of == today), the latest FRED DGS2
@@ -1509,7 +1509,7 @@ def fetch_macro_context(today):
     # Gold GLD 1D% (Zoe 08-28 m3): 1D% MUST use GLD (ETF, no roll inflation),
     # never GC=F continuous. GC=F level is kept for the absolute price; the
     # daily change benchmark is GLD. Material-move threshold is the named
-    # constant GOLD_MATERIAL_MOVE_PCT = 1.5 (Zoe 09-03 m2, t_8cd84165) —
+    # constant GOLD_MATERIAL_MOVE_PCT = 1.5 (Zoe 09-03 m2, t_ticket) —
     # emitted into the ctx so data.json + gold header are self-describing.
     try:
         df = yf.download("GLD", period="10d", interval="1d", progress=False, auto_adjust=False)
@@ -1536,7 +1536,7 @@ def fetch_macro_context(today):
 
 def gold_context_summary(macro_ctx):
     """Build a self-describing gold_context block for data.json (Zoe 09-03 m2,
-    t_8cd84165): GC=F level + GLD 1D% + the gold-specific material-move
+    t_ticket): GC=F level + GLD 1D% + the gold-specific material-move
     threshold, so consumers see WHY a GLD move flagged (e.g. +1.85%) while the
     equity universe uses a different 5.0% gate. Returns None when macro_ctx is
     unavailable or has no gold data."""
@@ -1558,10 +1558,10 @@ def gold_context_summary(macro_ctx):
 
 
 # ══════════════════════════════════════════════════════════════════════
-# RSI LABEL DIRECTION + DRIVER CAUSATION (Zoe W34 #2b, t_e6ad7a37)
+# RSI LABEL DIRECTION + DRIVER CAUSATION (Zoe W34 #2b, t_ticket)
 # ══════════════════════════════════════════════════════════════════════
 # Rubric #81 family, 3rd recurrence (07-15 → 08-18 → 08-21): the 08-21 T&M
-# report labelled UNH RSI=31.4 / PNC RSI=35.6 (oversold zone) as
+# report labelled a 31.4 / 35.6 RSI pair (both names in the oversold zone) as
 # "overbought". Root cause: the label was derived from the RSI SUB-SCORE.
 # score_rsi maps RSI<30→12 AND RSI>75→5, so a low RSI score can mean EITHER
 # weak RSI (30-42) OR overbought (RSI>75). Labeling by score inverts the
@@ -1578,7 +1578,7 @@ RSI_OVERBOUGHT_LABEL = "RSI overbought"
 RSI_MOMENTUM_LABEL = "RSI momentum"
 RSI_WEAK_LABEL = "RSI "
 
-# ── RSI scoring-zone labels (Zoe 08-27 M2, t_692f4462) ──
+# ── RSI scoring-zone labels (Zoe 08-27 M2, t_ticket) ──
 # The RSI sub-score curve is NON-monotonic (score_rsi):
 # rsi < 30 → 12 (oversold mean-reversion) <30 → "oversold "
 # 30–40 → 1–5 () 30–40 → ""
@@ -1586,7 +1586,7 @@ RSI_WEAK_LABEL = "RSI "
 # 70–75 → 17–19 (, bullish ) 70–75 → "momentum "
 # rsi > 75 → 5 () >75 → "overbought "
 # A single "overbought"/"oversold" word conflated two OPPOSITE scoring
-# outcomes (MRK 72.0 → sub 18 vs GILD 80.5 → sub 5, both "overbought").
+# outcomes (two names at 72.0 → sub 18 vs 80.5 → sub 5, both "overbought").
 # Labels are now zone-precise so the reader can tell sweet-spot from penalty.
 RSI_MOMENTUM_STRONG_LABEL = "RSI momentum " # 70–75 sweet spot (highest sub-score)
 RSI_OVERBOUGHT_PENALTY_LABEL = "RSI overbought " # >75 penalty
@@ -1707,14 +1707,14 @@ def driver_from_change(scores, prev_breakdown, raw=None, direction=1,
 
     Falls back to state-based driver_from_scores when no previous breakdown.
 
-    Zoe 08-27 M2 (t_692f4462): the RSI driver MUST attach the raw RSI
+    Zoe 08-27 M2 (t_ticket): the RSI driver MUST attach the raw RSI
     before→after values whenever the previous day's raw RSI is available.
-    Zoe 08-28 M1 root-fix (t_fb574bfa): the PRIMARY number is now the RAW
+    Zoe 08-28 M1 root-fix (t_ticket): the PRIMARY number is now the RAW
     RSI delta (e.g. "RSI 80.5→72.0 (−8.5) [sub +13]") with the sub-score
     change in secondary position — never the sub-score delta, whose
     non-monotonic zone curve (70–75 sweet spot / >75 penalty) can point
-    opposite to raw RSI direction (GILD sub +13 while raw FELL; HD sub −12
-    while raw ROSE). When prev_raw is missing (first run, unit tests),
+    opposite to raw RSI direction (one name's sub +13 while raw FELL; another's
+    sub −12 while raw ROSE). When prev_raw is missing (first run, unit tests),
     fall back to zone-precise short tags.
     """
     raw = raw or {}
@@ -1740,12 +1740,12 @@ def driver_from_change(scores, prev_breakdown, raw=None, direction=1,
         elif key == "rsi":
             raw_rsi = raw.get("rsi")
             if raw_rsi is not None and prev_raw is not None:
-                # Zoe 08-28 M1 root-fix (t_fb574bfa): PRIMARY number is the
+                # Zoe 08-28 M1 root-fix (t_ticket): PRIMARY number is the
                 # RAW RSI delta, sub-score change moves to secondary position.
                 # The RSI scoring zone is NON-monotonic (75 penalty cliff,
                 # 70-75 sweet zone, <30 sweet / 30-40 low), so a sub-score
-                # delta can point OPPOSITE to raw RSI (GILD sub +13 while raw
-                # FELL 80.5→72.0; HD sub −12 while raw ROSE 25.4→30.0). The
+                # delta can point OPPOSITE to raw RSI (one name's sub +13 while
+                # raw FELL 80.5→72.0; another's sub −12 while raw ROSE 25.4→30.0). The
                 # first number the reader sees must be the market direction.
                 txt = (f"RSI {prev_raw:.1f}→{raw_rsi:.1f} "
                        f"({raw_rsi - prev_raw:+.1f}) [sub {d:+d}]")
@@ -1804,15 +1804,15 @@ def scan_driver_label_violations(results, prev_breakdowns=None):
 
 def rsi_driver_direction_violation(scores, prev_breakdown, raw=None,
                                    prev_raw=None):
-    """Zoe 08-27 M2 (t_692f4462): driver-direction vs raw-RSI-direction
+    """Zoe 08-27 M2 (t_ticket): driver-direction vs raw-RSI-direction
     cross-check.
 
     The RSI sub-score curve is NON-monotonic (70–75 → 17–19 sweet spot,
     >75 → 5 penalty; <30 → 12 sweet, 30–40 → 1–5 low), so a positive
-    sub-score delta can accompany a FALLING raw RSI (MRK 78.0→72.0 with
-    sub +13 on 08-27). The old W34 #2b scan only checked label TEXT vs raw
+    sub-score delta can accompany a FALLING raw RSI (a 78.0→72.0 fall with
+    sub +13 in one reviewed run). The old W34 #2b scan only checked label TEXT vs raw
     RSI — it never checked driver DIRECTION vs raw RSI direction, so the
-    footer claimed "0 violations" while MRK/AMGN/HON contradicted.
+    footer claimed "0 violations" while three names contradicted.
 
     Returns a violation string when the raw RSI moved materially (|Δ| >=
     0.5) in the OPPOSITE direction to the RSI sub-score delta; None when
@@ -1858,7 +1858,7 @@ def scan_driver_direction_violations(results, prev_breakdowns=None,
 
 
 def compute_sector_momentum_map(results):
-    """Zoe 09-04 M1 (t_94cfd4c8): sector 'Adj mean' map.
+    """Zoe 09-04 M1 (t_ticket): sector 'Adj mean' map.
 
     sector_momentum[s] = round(mean(Adj score of TODAY'S universe members in
     sector s)) — an intra-universe cross-sectional attribution recomputed
@@ -1880,7 +1880,7 @@ def compute_sector_momentum_map(results):
 
 def format_momentum_table_1d_cell(r, score_change, prev_breakdowns=None,
                                   prev_raws=None):
-    """Zoe 09-04 m3 (t_94cfd4c8): inline 1D% cell for the Gainer/Loser tables.
+    """Zoe 09-04 m3 (t_ticket): inline 1D% cell for the Gainer/Loser tables.
 
     Flags (auto-emitted so table-level readability never depends on header /
     footer notes):
@@ -1888,8 +1888,8 @@ def format_momentum_table_1d_cell(r, score_change, prev_breakdowns=None,
                    (score gainer but price DOWN / score loser but price UP) —
                    the composite score is NOT price momentum.
       [sub↔raw opposite] when the RSI sub-score delta opposes the raw RSI delta
-                   (VRTX raw 76.2→65.0, Δ−11.2 but sub +10 = leaving the
-                   overbought penalty zone; HD raw 26.6→34.9, Δ+8.3 but
+                   (one name raw 76.2→65.0, Δ−11.2 but sub +10 = leaving the
+                   overbought penalty zone; another raw 26.6→34.9, Δ+8.3 but
                    sub −10 = leaving the oversold sweet spot) — non-monotonic
                    RSI scoring-curve design, not momentum improvement.
     Also keeps the single-stock |1D%| ≥ MATERIAL_MOVE_PCT 🔴/🟢 suffix used
@@ -2041,7 +2041,7 @@ def build_suppressed_buy_section(results, regime, spy_adx, prev_scores=None):
 
 
 def main():
-    # ── CLI (Zoe 09-01 B1b, t_b5acc944) ──
+    # ── CLI (Zoe 09-01 B1b, t_ticket) ──
     # --date YYYY-MM-DD : regenerate a DATED report (post-close regeneration
     #                     of {date} from close data).
     # --note TEXT       : annotation appended to the Run ID header + stored as
@@ -2062,7 +2062,7 @@ def main():
     report_date = _args.date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
     run_note = _args.note
 
-    # --date is ONLY for SAME-DAY post-close regeneration (t_b5acc944 B1b).
+    # --date is ONLY for SAME-DAY post-close regeneration (t_ticket B1b).
     # The generator always fetches TODAY's cache key — a past --date would
     # write today's bars under a past filename (data corruption). Historical
     # rebuilds belong to build_snapshot.py / the weekly pipeline, not here.
@@ -2087,7 +2087,7 @@ def main():
             print(f"[♻️] --refresh: no cache dir {today_cache_dir} to remove",
                   file=sys.stderr)
 
-    # ── Market Close Guard — EARLY gate (Zoe 09-01 B1, t_b5acc944) ──
+    # ── Market Close Guard — EARLY gate (Zoe 09-01 B1, t_ticket) ──
     # Run BEFORE any fetch/scoring: a current-day run before 20:00 UTC must
     # exit immediately. This is what makes "pre-close generator run is
     # REJECTED" cheap AND prevents polluting today's cache with intraday bars
@@ -2124,7 +2124,7 @@ def main():
 
     universe = load_universe()
 
-    # ── Environment note (08-11 Zoe BLOCKER t_b18a2102) ──
+    # ── Environment note (08-11 Zoe BLOCKER t_ticket) ──
     # pandas_ta may be unavailable under the default interpreter (numba needs
     # numpy<=2.2; hermes venv has numpy 2.4). get_spy_adx() now falls back to
     # the manual true-Wilder implementation, so ADX is env-independent — but
@@ -2137,7 +2137,7 @@ def main():
               file=sys.stderr)
 
     # Market regime from SPY daily — HARD-FAIL on invalid ADX (08-11 Zoe
-    # BLOCKER t_b18a2102): get_regime_daily() now raises instead of silently
+    # BLOCKER t_ticket): get_regime_daily() now raises instead of silently
     # returning regime="ranging"/ADX=0, which previously bypassed Option G and
     # produced 19 false BUY signals.
     try:
@@ -2151,7 +2151,7 @@ def main():
         sys.exit(2)
     print(f"[🌍] Regime: {regime} | SPY ADX: {spy_adx} | VIX: {vix_close}", file=sys.stderr)
 
-    # ── ADX live verification (Zoe W32 rec #2, task t_43a4ebb6) ──
+    # ── ADX live verification (Zoe W32 rec #2, task t_ticket) ──
     # Before publishing, recompute SPY ADX with true-Wilder smoothing (manual,
     # no pandas_ta) on the SAME cached SPY data and compare against the cached
     # ADX used for the regime. |diff| > 1.0 -> BLOCK publish. The 08-11
@@ -2167,7 +2167,7 @@ def main():
             cached_override=spy_adx,
             length=14,
             threshold=1.0,
-            use_cache=False,    # 08-20 P1 (t_85a14c20): verify on FRESH
+            use_cache=False,    # 08-20 P1 (t_ticket): verify on FRESH
                                 # yfinance, not the cache being validated
         )
         if adx_verify.get("flagged"):
@@ -2236,11 +2236,11 @@ def main():
 
     print(f"[📡] Downloaded: {len(batch_data)}/{len(scoring_universe)} | Fallback: {len(batch_errors)} failed", file=sys.stderr)
 
-    # ── T&M Freshness Watchdog (t_512ecc00, W34→W35 P0) ──
+    # ── T&M Freshness Watchdog (t_ticket, W34→W35 P0) ──
     # Report-layer as-of check BEFORE scoring: if the batch data's last bar
     # predates the expected trading day, block — a {today}-report must never
     # be built on stale data (08-20 incident: cache dir 2026-08-20/ held
-    # 08-19 closes and was read as fresh). Reuses the t_85a14c20
+    # 08-19 closes and was read as fresh). Reuses the t_ticket
     # expected-trading-day definition (UTC keys + weekend/holiday walk-back).
     from tm_freshness_watchdog import check_report_data_freshness, guard_report_freshness
     freshness = check_report_data_freshness(batch_data, today=report_date)
@@ -2255,7 +2255,7 @@ def main():
           file=sys.stderr)
 
     # ── Prev-day baseline (loaded BEFORE the screen so Rule 5 hysteresis can
-    #    consult yesterday's PUBLISHED universe membership; Zoe 09-02 t_7915ddcc) ──
+    #    consult yesterday's PUBLISHED universe membership; Zoe 09-02 t_ticket) ──
     _prev = load_prev_daily_comparison(report_date)
     prev_date = _prev.get("date", "")
     prev_path = _prev.get("path")
@@ -2276,7 +2276,7 @@ def main():
     screened_errors = 0
     atr_missed = 0
     screened_pass = 0
-    # Zoe 09-02 challenge (t_7915ddcc): per-ticker screen-failure capture so
+    # Zoe 09-02 challenge (t_ticket): per-ticker screen-failure capture so
     # the universe-change note can disclose WHY a ticker left (never a bare
     # "−PFE" for a technical_screen exclusion) + hysteresis-kept disclosure.
     screen_failures = {}   # ticker -> {reason, metrics, prev_score, prev_rank}
@@ -2479,7 +2479,7 @@ def main():
 
     print(f"\n[📊] Scored {len(results)}/{len(scoring_universe)} | Screen pass: {screened_pass} | Screen fail: {screened_errors} | Errors: {errors} | ATR missed: {atr_missed}", file=sys.stderr)
 
-    # ── Same-as-of 1D% prev-close lock (Zoe 09-07 M1, t_6ed3ff15) ──
+    # ── Same-as-of 1D% prev-close lock (Zoe 09-07 M1, t_ticket) ──
     # Holiday / weekend / same-day re-run: the current data-as-of equals the
     # previous PUBLISHED report's data-as-of, so every published 1D% must stay
     # identical. A fresh yfinance fetch can silently back-adjust history
@@ -2525,7 +2525,7 @@ def main():
               f"1D% recomputed from the new bar (no lock)",
               file=sys.stderr)
 
-    # ── Compute sector 'Adj mean' (Zoe 09-04 M1, t_94cfd4c8) ──
+    # ── Compute sector 'Adj mean' (Zoe 09-04 M1, t_ticket) ──
  # Column renamed from (which read like a sector rotation /
  # relative-strength signal) to Adj: this is round(mean(Adj score
     # of TODAY'S universe members in the sector)) — an intra-universe
@@ -2540,7 +2540,7 @@ def main():
     # ── Prev-day baseline ──
     # P0 root cause fix (Rubric #82): baseline MUST be the most recent
     # published DAILY report (its Today brackets), NOT weekly_snapshots.
-    # Zoe 09-02 (t_7915ddcc): loaded EARLIER (before the scoring loop) via
+    # Zoe 09-02 (t_ticket): loaded EARLIER (before the scoring loop) via
     # load_prev_daily_comparison() so technical_screen Rule 5 hysteresis can
     # consult yesterday's universe membership. All prev_* vars, prev_tickers,
     # prev_ranked/prev_rank_index are already in scope here.
@@ -2571,7 +2571,7 @@ def main():
         # M2 fix (Rubric #81): was_buy must use the PREVIOUS DAY's VERDICT, not
         # the prev score. Using score >= 70 was wrong when Option G was active
         # yesterday (BUY=0): stocks with score >= 70 but verdict NO SIGNAL were
-        # flagged as "lost BUY" even when unchanged/gaining (MRK 90.4→90.4, etc).
+        # flagged as "lost BUY" even when unchanged/gaining (e.g. 90.4→90.4 flat).
         prev_v = prev_verdicts.get(t, "")
         if prev_v:
             was_buy = "BUY" in prev_v and "NO" not in prev_v
@@ -2610,31 +2610,31 @@ def main():
     # ── Driver explanation ──
     # RSI label direction + driver causation live in module-level helpers
     # (rsi_state_label / driver_from_scores / driver_from_change, Zoe W34
-    # #2b, t_e6ad7a37) so they are unit-testable. Labels derive from the RAW
+    # #2b, t_ticket) so they are unit-testable. Labels derive from the RAW
     # RSI value (never the RSI sub-score — score_rsi maps RSI<30→12 AND
     # RSI>75→5, so a low score can mean weak OR overbought; labeling by score
-    # produced the 08-21 UNH/PNC inversion). Driver text derives from
+    # produced the late-August oversold-labelled-overbought inversion). Driver text derives from
     # per-indicator score deltas vs the previous day (cause, not state):
     # gainers list pull-up factors, losers list pull-down factors.
 
     # ── Generate Report ──
     signals_70plus = sum(1 for r in results if "BUY" in (r.get("verdict", "") or "").upper() and "NO" not in (r.get("verdict", "") or "").upper())
-    # 08-20 P0 (t_85a14c20): report date must be UTC. Was datetime.now()
+    # 08-20 P0 (t_ticket): report date must be UTC. Was datetime.now()
     # (local TZ, Asia/Hong_Kong) — at 22:00 UTC the local date is already the
     # NEXT day, so files/cache dirs rolled one day early (2026-08-20 cache
     # populated at 08-19 22:05 UTC with 08-19 closes → 08-20 report 100% stale).
-    # 09-01 (t_b5acc944): --date override for post-close regeneration.
+    # 09-01 (t_ticket): --date override for post-close regeneration.
     today = report_date
     prev_label = prev_date if prev_date else "W25 (2026-06-13)"
 
     report_lines = []
     report_lines.append(f"# 📈 Daily Trend & Momentum Report — {today}")
     report_lines.append(f"")
-    # Zoe 09-02 m1 (t_7915ddcc): label must match the ACTUAL universe
+    # Zoe 09-02 m1 (t_ticket): label must match the ACTUAL universe
     # composition — 25 watchlist (Track A/B, always scored) + N non-watchlist
  # technical_screen passes (Source , ATR level). The old
     # "Daily (Watchlist Only)" label misled readers into thinking all rows
-    # were watchlist when 5 (e.g. GILD/AMGN/VRTX/TMO/PAYX) were screen-pass.
+    # were watchlist when 5 names were screen-pass.
     _n_wl_rows = sum(1 for r in results if r["ticker"] in watchlist_tickers)
     _n_sp_rows = len(results) - _n_wl_rows
     report_lines.append(
@@ -2643,13 +2643,13 @@ def main():
         f"**Generator:** Renee (Trend & Momentum Trader)")
     report_lines.append(f"> **Data:** Daily OHLCV (250d) | Shared Data Cache  |  **Scoring:** 5-Indicator + DMI + OBV + Regime Adj")
     report_lines.append(f"> **Run ID:** `{get_run_id()}`{(' (**' + run_note + '**)') if run_note else ''}  |  **Config Version:** `{CONFIG_VERSION}`  |  **Regime:** `{regime}`")
-    # 08-20 P2 (t_85a14c20): surface data as-of + the actual ADX/VIX values
+    # 08-20 P2 (t_ticket): surface data as-of + the actual ADX/VIX values
     # used for the regime call (stale-cache auditability).
-    # 08-22 (t_512ecc00): data as-of now comes from the freshness watchdog
+    # 08-22 (t_ticket): data as-of now comes from the freshness watchdog
     # (actual max last-bar across the batch), not just today's date — so a
     # report can never claim an as-of its data doesn't have.
     report_lines.append(f"> **Data as-of:** `{data_as_of_s}` (expected `{expected_as_of_s}`) | **SPY ADX14:** `{spy_adx}`  |  **VIX:** `{vix_close}`")
-    # 1.0.5 (t_6ed3ff15): disclose when the same-as-of 1D% prev-close lock
+    # 1.0.5 (t_ticket): disclose when the same-as-of 1D% prev-close lock
     # fired — holiday/weekend re-run whose data-as-of equals the previous
     # published report's; readers must know 1D% is anchored to published
     # values, not a re-fetched (possibly back-adjusted) reference.
@@ -2675,11 +2675,11 @@ def main():
     report_lines.append(f"")
     report_lines.append(f"### ")
 
-    # ── Macro context (P0-3 + P1-5 fix, t_1dacac8d) ──
+    # ── Macro context (P0-3 + P1-5 fix, t_ticket) ──
     # Bond context must use the SAME trading day's Treasury H.15 close (or be
     # explicitly labeled T-1). Gold reference must use the latest GC=F close.
  # Signal label derives from the actual bp move — never call a +5bp day .
-    # m1 fix (Zoe 09-03, t_8cd84165): label the source Treasury H.15 (NOT FRED)
+    # m1 fix (Zoe 09-03, t_ticket): label the source Treasury H.15 (NOT FRED)
     # and disclose the FRED DGS2 prev-day lag (same underlying series, FRED
     # republishes T+1; rubric #77 canonical = FRED DGS2).
     macro_ctx = None
@@ -2702,16 +2702,16 @@ def main():
             report_lines.append(f"> {_lag}")
         if macro_ctx.get("gold_close"):
             report_lines.append(f"")
-            # Zoe 08-28 m3 (t_fb574bfa): 1D% benchmark MUST be GLD (ETF, no
+            # Zoe 08-28 m3 (t_ticket): 1D% benchmark MUST be GLD (ETF, no
             # roll inflation), never GC=F continuous. GC=F level retained for
             # absolute price; GLD 1D% shown for the daily move + material tag.
-            # Zoe 09-02 m3 (t_7915ddcc): every instrument is EXPLICITLY
+            # Zoe 09-02 m3 (t_ticket): every instrument is EXPLICITLY
             # labeled in the header — no silent mixing of futures level with
             # ETF 1D%. Both numbers stay in one line for context, each tagged.
-            # Zoe 09-03 m2 (t_8cd84165): the 🔴 material flag threshold is
+            # Zoe 09-03 m2 (t_ticket): the 🔴 material flag threshold is
             # disclosed inline (GOLD_MATERIAL_MOVE_PCT = 1.5%, gold-specific)
             # so readers never compare it to the equity universe 5.0% gate.
-            # Zoe 09-04 m1 (t_94cfd4c8): GLD ETF level emitted IN PARALLEL
+            # Zoe 09-04 m1 (t_ticket): GLD ETF level emitted IN PARALLEL
             # with the GC=F continuous level — the level/return instrument
             # split is fully disclosed: GC=F continuous level is a roll-
             # distorted macro reference only, the TRADABLE level is GLD, and
@@ -2729,7 +2729,7 @@ def main():
                     f"({_gold_date} )")
             gld_pct = macro_ctx.get("gold_gld_1d_pct")
             if gld_pct is not None:
-                # Zoe 09-03 m2 (t_8cd84165): always disclose the gold-specific
+                # Zoe 09-03 m2 (t_ticket): always disclose the gold-specific
                 # material-move threshold so readers know why a GLD move flags
                 # while the equity universe uses a different (5.0%) gate.
                 _reconcile = ("level/return , reconcile"
@@ -2787,7 +2787,7 @@ def main():
             univ_parts.append("+" + ", +".join(added))
         report_lines.append(f"> ⚠️ **Universe change ({prev_total}→{len(results)}):** {' '.join(univ_parts)} — "
                             f"Change universe ,/.")
-        # Zoe 09-02 P1 #1 (t_7915ddcc): NEVER write a bare "−PFE" when the
+        # Zoe 09-02 P1 #1 (t_ticket): NEVER write a bare "−PFE" when the
         # ticker was dropped by technical_screen — disclose the screen_failed
         # cause + prev-day context (score / rank) so a material omission
         # (e.g. yesterday's #1) can't be framed as a routine rebalance.
@@ -2819,7 +2819,7 @@ def main():
             report_lines.append(
                 f"> ⚠️ **near-miss:** {', '.join(top10_removed)} top-10 "
                 f" universe( technical_screen )—— .")
-    # Zoe 09-02 P1 #2 (t_7915ddcc): Rule 5 hysteresis retention disclosure.
+    # Zoe 09-02 P1 #2 (t_ticket): Rule 5 hysteresis retention disclosure.
     # Incumbents whose 20-day mean daily range fell inside [1.8%, 2.0%) are
     # KEPT (admission threshold only applies to new candidates) — say so,
     # with prev-day rank, instead of letting the reader wonder why a
@@ -2889,7 +2889,7 @@ def main():
     # ── End Bracket WR Backtest Reference ──
 
     # ── Rolling 4-Week Bracket WR (Zoe Rubric #69) — LIVE ──
-    # W35 P0 (t_c36bf49b): wired LIVE from weekly_snapshots. The previous
+    # W35 P0 (t_ticket): wired LIVE from weekly_snapshots. The previous
     # implementation read the static backtest latest-weekly-summary.json
     # (stuck at latest_week 07-25) and labeled it "(Live)" — frozen for 4
     # weeks. Now computed from the actual weekly snapshots each run with the
@@ -2939,7 +2939,7 @@ def main():
                 f"v2.1 / dmi-gating backtest methodology). "
                 f"{rolling_wr.get('live_resolve_note')}."
             )
-            # Zoe 08-28 P2 (t_fb574bfa): the latest week is a PARTIAL-week
+            # Zoe 08-28 P2 (t_ticket): the latest week is a PARTIAL-week
             # resolve (live daily SMA10 partial fwd return, ~5 days) — WR
             # volatility is amplified (window roll + n contraction), so the
             # latest-week number must NOT be compared to full-week history.
@@ -3004,7 +3004,7 @@ def main():
             return "❌ NO SIGNAL"
 
     report_lines.append(f"**Signal Legend:** 🟢 BUY (≥70 + DMI↑ OR verdict=BUY) | 👀 WATCH (60-69 / DMI↓ OR verdict=WATCH) | 📋 MONITOR (50-59) | ❌ NO SIGNAL (<50 OR verdict=NO_SIGNAL)")
-    # M1 design decision (Zoe 09-01, t_b5acc944): RSI sub-score curve is
+    # M1 design decision (Zoe 09-01, t_ticket): RSI sub-score curve is
     # intentionally non-monotonic — oversold (<30) gets a mean-reversion
     # sweet spot (sub 12), 30–40 low band gets 1–5, 70–75 momentum sweet
     # spot gets 17–19, >75 gets a penalty 5. Consequence: a FALLING RSI into
@@ -3016,14 +3016,14 @@ def main():
     report_lines.append(f"**RSI (Zoe 09-01 M1, document):** RSI sub-score intentionally —— <30(oversold )→ mean-reversion(,backtest );30–40()→ ;70–75(momentum )→ ;>75(overbought)→ 5.**:** raw RSI (e.g. 30→26)sub-score —— **' gainer''',,**.Driver primary raw RSI delta(),`[sub ±N]` zone (secondary),.")
     report_lines.append(f"**Dual Score:** published daily_score (clipped 0–100) | base_5indicator_total (raw unweighted 0–100); audit weighted_total_raw uncapped")
     report_lines.append(f"**Order:** Daily score descending")
-    # m3 fix (Zoe 08-27, t_692f4462): the Weekly column sources from
+    # m3 fix (Zoe 08-27, t_ticket): the Weekly column sources from
     # weekly_snapshots (not this run's data.json) — state it so the Zoe #70
     # cross-section claim is scoped honestly. weekly_score is also written
     # into data.json for future verification coverage.
     report_lines.append(f"> **Weekly (m3):** `weekly_snapshots`( data.json );"
                         f"Zoe #70 cross-section Adj/Base/1D%/bracket, Weekly ("
                         f"weekly_score data.json ).")
- # Zoe 09-04 M1 (t_94cfd4c8): column renamed to Adj and
+ # Zoe 09-04 M1 (t_ticket): column renamed to Adj and
     # the methodology is now auto-disclosed right above the table — source /
     # window / update frequency / sector sample — so readers never read it
     # as a sector rotation or relative-strength signal (an intra-universe
@@ -3061,7 +3061,7 @@ def main():
         raw_data = r.get("raw", {})
         chg_pct = raw_data.get("change_pct")
         one_d_pct = f"{chg_pct*100:+.2f}%" if chg_pct is not None and not (isinstance(chg_pct, float) and math.isnan(chg_pct)) else "—"
-        # Zoe 09-02 m2 (t_7915ddcc): single-stock material-move flag — same
+        # Zoe 09-02 m2 (t_ticket): single-stock material-move flag — same
         # |1D%| >= MATERIAL_MOVE_PCT standard as the Key Ticker Notes table
         # (PANW -9.28% must never pass unflagged). 🔴 down / 🟢 up.
         if (chg_pct is not None
@@ -3084,14 +3084,14 @@ def main():
     # Top 10 gainers
     gainers = [c for c in changes if c["change"] > 0][:10]
     report_lines.append(f"### Top 10 Score Gainers")
-    # Zoe 09-04 m3 (t_94cfd4c8): 1D% column + inline flags (⚠️ scoreΔ vs 1D%
+    # Zoe 09-04 m3 (t_ticket): 1D% column + inline flags (⚠️ scoreΔ vs 1D%
  # opposite; [sub↔raw ] RSI sub-score vs raw delta opposite) — see
     # format_momentum_table_1d_cell().
     report_lines.append(f"| Ticker | Today | Prev | Change | 1D% | Driver |")
     report_lines.append(f"|--------|:-----:|:----:|:------:|:---:|--------|")
     for c in gainers:
         r = scored_dict[c["ticker"]]
-        # P0-2 fix (t_1dacac8d): gainers list PULL-UP factors (positive deltas)
+        # P0-2 fix (t_ticket): gainers list PULL-UP factors (positive deltas)
         d = driver_from_change(r["scores"], prev_breakdowns.get(r["ticker"]),
                                r.get("raw", {}), direction=1,
                                prev_raw=prev_raws.get(r["ticker"]))
@@ -3104,12 +3104,12 @@ def main():
     # Top 10 losers
     losers = [c for c in changes if c["change"] < 0][:10]
     report_lines.append(f"### Top 10 Score Losers")
-    # Zoe 09-04 m3 (t_94cfd4c8): 1D% column + inline flags (same as gainers).
+    # Zoe 09-04 m3 (t_ticket): 1D% column + inline flags (same as gainers).
     report_lines.append(f"| Ticker | Today | Prev | Change | 1D% | Driver |")
     report_lines.append(f"|--------|:-----:|:----:|:------:|:---:|--------|")
     for c in losers:
         r = scored_dict[c["ticker"]]
-        # P0-2 fix (t_1dacac8d): losers list PULL-DOWN factors (negative deltas)
+        # P0-2 fix (t_ticket): losers list PULL-DOWN factors (negative deltas)
         d = driver_from_change(r["scores"], prev_breakdowns.get(r["ticker"]),
                                r.get("raw", {}), direction=-1,
                                prev_raw=prev_raws.get(r["ticker"]))
@@ -3119,15 +3119,15 @@ def main():
         report_lines.append(f"| {c['ticker']} | {c['today']:.1f} | {c['prev']:.1f} | **{c['change']:.1f}** | {_cell} | {d} |")
     report_lines.append(f"")
 
-    # Zoe 09-04 m3 (t_94cfd4c8): flag legend auto-emitted right after the two
+    # Zoe 09-04 m3 (t_ticket): flag legend auto-emitted right after the two
  # tables so the inline ⚠️ / [sub↔raw ] meaning never drifts from the
     # table that carries it (report-layer readability, generator-owned).
     report_lines.append(f"> ⚠️ **m3 inline flags (Zoe 09-04):** `⚠️` = scoreΔ 1D% "
                         f"(score gainer / score loser )—— ≠ , RSI "
                         f" + indicator ( Full Ranking legend)."
                         f"`[sub↔raw opposite]` = RSI sub-score raw RSI delta "
-                        f"( VRTX raw 76.2→65.0 −11.2 sub +10 = overbought ;"
-                        f"HD raw 26.6→34.9 +8.3 sub −10 = oversold )—— /.")
+                        f"( raw 76.2→65.0 −11.2 sub +10 = overbought ;"
+                        f"a raw 26.6→34.9 +8.3 sub −10 = oversold )—— /.")
     report_lines.append(f"")
 
     # New BUY signals
@@ -3144,7 +3144,7 @@ def main():
         report_lines.append(f"| (none) | — | — | — |")
     report_lines.append(f"")
 
-    # ── Lost BUY Signals (vs prev) — Zoe 08-27 B1 (t_692f4462) ──
+    # ── Lost BUY Signals (vs prev) — Zoe 08-27 B1 (t_ticket) ──
     # B1 root cause: this section answered "did any YESTERDAY BUY get lost"
     # while its renamed title ("Suppressed BUY-eligible") implied "which
     # high-score stocks are suppressed TODAY". Two concepts were conflated.
@@ -3192,7 +3192,7 @@ def main():
     )
     report_lines.append(f"")
     report_lines.append(f"**Entry formula:** Close + 0.5×ATR14 | **SL:** Entry − 0.75×ATR14 (min 0.5× floor) | **TP:** Entry + 1.5×ATR14")
-    # M1 basis note (Zoe 09-03, t_8cd84165, Renee methodology decision =
+    # M1 basis note (Zoe 09-03, t_ticket, Renee methodology decision =
     # Option B): this ladder is a SINGLE-POINT-ENTRY construction (trigger
     # above close, 0.75-ATR stop from the trigger). It is NOT the
     # technical-snapshot zone-floor construction. The note is always emitted
@@ -3212,7 +3212,7 @@ def main():
     notable = sorted(changes, key=lambda x: abs(x["change"]), reverse=True)
     noted = 0  # counter — named `noted`, NOT `added` (added is the universe
     #            change list above; reusing the name shadowed it and corrupted
-    #            universe_meta["added"] — t_7915ddcc)
+    #            universe_meta["added"] — t_ticket)
     for c in notable:
         if noted >= 5:
             break
@@ -3226,7 +3226,7 @@ def main():
         tag = ""
         if is_new: tag = " 🆕 NEW BUY"
         elif is_lost: tag = " ⛔ LOST BUY"
- # P1-5 fix (t_1dacac8d): surge/plunge labels must carry ' Δ'
+ # P1-5 fix (t_ticket): surge/plunge labels must carry ' Δ'
         # prefix so they can't be confused with 1D% price moves.
         elif c["change"] >= 10: tag = " 🔥 Δ surge"
         elif c["change"] <= -10: tag = " 💥 Δ plunge"
@@ -3242,7 +3242,7 @@ def main():
         report_lines.append(f"")
         noted += 1
 
- # ── / Material Moves (Zoe 09-02 m2, t_7915ddcc) ──
+ # ── / Material Moves (Zoe 09-02 m2, t_ticket) ──
     # Single-stock |1D%| >= MATERIAL_MOVE_PCT standard — SAME threshold that
     # drives the 🔴/🟢 flag in the Full Ranking 1D% column above (and the same
     # flag family as gold's 🔴 material move). Any stock at this magnitude
@@ -3322,17 +3322,17 @@ def main():
         report_lines.append(f"✅ Cross-section consistency verified (Zoe #70) — {len(results)} stocks match")
 
     # ── RSI label direction + driver causation auto-check (Zoe W34 #2b) ──
-    # Rubric #81 family 3rd recurrence: 08-21 T&M labelled UNH RSI 31.4 /
-    # PNC RSI 35.6 (oversold zone) as "overbought". Any rsi<35 label/text
+    # Rubric #81 family 3rd recurrence: a past T&M report labelled a 31.4 /
+    # 35.6 RSI pair (both names in the oversold zone) as "overbought". Any rsi<35 label/text
     # containing "overbought" OR rsi>65 label/text containing "oversold"
     # must BLOCK publish — zero label-direction errors may reach reports.
     # Checks BOTH label sources: rsi_state_label output AND the CAUSE driver
     # strings emitted for gainers/losers.
     label_violations = (scan_rsi_label_violations(results)
                         + scan_driver_label_violations(results, prev_breakdowns))
-    # Zoe 08-27 M2 (t_692f4462): the W34 #2b scan previously checked only
+    # Zoe 08-27 M2 (t_ticket): the W34 #2b scan previously checked only
     # label TEXT vs raw RSI. It never checked driver DIRECTION vs raw RSI
-    # direction, so MRK/AMGN/HON (sub +13/+12/+11 while raw FELL -5.9/-5.7/
+    # direction, so three names (sub +13/+12/+11 while raw FELL -5.9/-5.7/
     # -7.8) slipped through and the footer claimed "0 violations" — a FALSE
     # claim. Add the direction cross-check and report its findings honestly.
     direction_violations = scan_driver_direction_violations(
@@ -3350,10 +3350,10 @@ def main():
     if direction_violations:
         # NOT a hard publish block — the report presents the scoring-curve
         # artifacts (driver primary now shows the RAW RSI delta — M1 fix,
-        # t_fb574bfa — so the first number always matches market direction;
+        # t_ticket — so the first number always matches market direction;
         # the [sub ±N] secondary still discloses the non-monotonic sub-score
         # zone jump). The footer must NOT claim "0 violations".
-        # m1 fix (Zoe 09-01, t_b5acc944): header count MUST equal the number
+        # m1 fix (Zoe 09-01, t_ticket): header count MUST equal the number
         # of listed tickers — the 09-01 footer wrote (7) but displayed only
         # 6 ([:6] truncation). List ALL violations; count = len(list).
         _viol_all = direction_violations
@@ -3384,7 +3384,7 @@ def main():
             "base_5indicator_total": r.get("base_5indicator_total", r["total"]),
             "weighted_total_raw": r.get("weighted_total_raw", r["total"]),
             "raw_indicators": r["raw"],
-            # m3 fix (Zoe 08-27, t_692f4462): expose weekly score (from
+            # m3 fix (Zoe 08-27, t_ticket): expose weekly score (from
             # weekly_snapshots) in data.json so Zoe #70 cross-section
             # verification can cover the Weekly column too.
             "weekly_score": r.get("weekly_score"),
@@ -3399,7 +3399,7 @@ def main():
         }
         data_results.append(data_entry)
 
-    # ── Universe/meta for downstream audits (Zoe 09-02, t_7915ddcc) ──
+    # ── Universe/meta for downstream audits (Zoe 09-02, t_ticket) ──
     # Exposes the SAME facts the report discloses: universe composition
     # (watchlist vs screen-pass), screen_failures with reasons + prev-day
     # context, hysteresis-kept members, material moves. Lets Alice/Zoe verify
@@ -3431,7 +3431,7 @@ def main():
     }
 
     # Workspace data JSON (wrap in metadata dict for traceability)
-    # m2 fix (Zoe 09-01, t_b5acc944): round floats key-aware before write —
+    # m2 fix (Zoe 09-01, t_ticket): round floats key-aware before write —
     # data.json must never carry IEEE 754 residue (91.39999999999999 etc).
     ws_data_path = os.path.join(REPORT_DIR, data_filename)
     with open(ws_data_path, "w", encoding="utf-8") as f:
@@ -3440,21 +3440,21 @@ def main():
             "run_note": run_note,
             "config_version": CONFIG_VERSION,
             "date": today,
-            # 08-22 (t_512ecc00): actual data as-of from freshness watchdog
+            # 08-22 (t_ticket): actual data as-of from freshness watchdog
             "data_as_of": data_as_of_s,
             "expected_as_of": expected_as_of_s,
             "regime": regime,
             "spy_adx": spy_adx,
             "vix_close": vix_close,
             "adx_verify": adx_verify,
-            # P0-3 fix (t_1dacac8d): expose bond as-of + gold for auditability
-            # m1/m2 fix (Zoe 09-03, t_8cd84165): bond_context carries a
+            # P0-3 fix (t_ticket): expose bond as-of + gold for auditability
+            # m1/m2 fix (Zoe 09-03, t_ticket): bond_context carries a
             # self-describing "source" field; gold_context carries the
             # gold-specific material threshold (both emitted above).
             "bond_context": (macro_ctx if macro_ctx else None),
             "gold_context": gold_context_summary(macro_ctx),
             "universe_meta": universe_meta,
-            # 1.0.5 (t_6ed3ff15): same-as-of 1D% prev-close lock audit trail
+            # 1.0.5 (t_ticket): same-as-of 1D% prev-close lock audit trail
             "change_pct_lock": change_pct_lock,
             "results": data_results,
         }), f, ensure_ascii=False, indent=2)
@@ -3468,21 +3468,21 @@ def main():
             "run_note": run_note,
             "config_version": CONFIG_VERSION,
             "date": today,
-            # 08-22 (t_512ecc00): actual data as-of from freshness watchdog
+            # 08-22 (t_ticket): actual data as-of from freshness watchdog
             "data_as_of": data_as_of_s,
             "expected_as_of": expected_as_of_s,
             "regime": regime,
             "spy_adx": spy_adx,
             "vix_close": vix_close,
             "adx_verify": adx_verify,
-            # P0-3 fix (t_1dacac8d): expose bond as-of + gold for auditability
-            # m1/m2 fix (Zoe 09-03, t_8cd84165): bond_context carries a
+            # P0-3 fix (t_ticket): expose bond as-of + gold for auditability
+            # m1/m2 fix (Zoe 09-03, t_ticket): bond_context carries a
             # self-describing "source" field; gold_context carries the
             # gold-specific material threshold (both emitted above).
             "bond_context": (macro_ctx if macro_ctx else None),
             "gold_context": gold_context_summary(macro_ctx),
             "universe_meta": universe_meta,
-            # 1.0.5 (t_6ed3ff15): same-as-of 1D% prev-close lock audit trail
+            # 1.0.5 (t_ticket): same-as-of 1D% prev-close lock audit trail
             "change_pct_lock": change_pct_lock,
             "results": data_results,
         }), f, ensure_ascii=False, indent=2)
@@ -3504,7 +3504,7 @@ def main():
     with open(full_results_path, "w", encoding="utf-8") as f:
         json.dump(_round_payload({
             "date": today,
-            # 08-22 (t_512ecc00): actual data as-of from freshness watchdog
+            # 08-22 (t_ticket): actual data as-of from freshness watchdog
             "data_as_of": data_as_of_s,
             "expected_as_of": expected_as_of_s,
             "regime": regime,
@@ -3557,7 +3557,7 @@ def main():
     print(f"[💾] Saved: {shared_path}", file=sys.stderr)
 
     # ── 5b. Verify-after-write: confirm all output files are readable and valid ──
-    # (verify-after-write rule, t_5034ab16 W33). Every save must be verified
+    # (verify-after-write rule, t_ticket W33). Every save must be verified
     # by re-reading and checking content. A write that fails silently (e.g.
     # disk full, permission denied, partial write) must BLOCK report completion.
     verify_errors = []
@@ -3590,7 +3590,7 @@ def main():
 
 # ══════════════════════════════════════════════════════════════════════
 # ROLLING 4-WEEK BRACKET WIN RATE (Zoe Rubric #69) — LIVE engine
-# t_c36bf49b (W34→W35 P0): replaces the frozen backtest
+# t_ticket (W34→W35 P0): replaces the frozen backtest
 # latest-weekly-summary.json read (stuck at 2026-07-25) AND the never-wired
 # bracket_history stub. Computed fresh from weekly_snapshots every run with
 # the same methodology as the canonical backtests.
@@ -3612,7 +3612,7 @@ def compute_rolling_4wk_wr_live(db_path=None, n_weeks=4, slippage=0.001,
     forward data until the next weekly run lands). The window rolls
     automatically as new weekly snapshots are written.
 
-    Zoe 08-27 B2 (t_692f4462): the pending week (latest weekly snapshot)
+    Zoe 08-27 B2 (t_ticket): the pending week (latest weekly snapshot)
     is now ALSO resolved when `live_sma10` is provided — a {ticker: current
     daily SMA10} map from the daily batch. That lets the newest week enter
     the rolling window immediately (partial-week forward return vs live
@@ -3709,7 +3709,7 @@ def compute_rolling_4wk_wr_live(db_path=None, n_weeks=4, slippage=0.001,
     meta["n_weeks"] = len(pairs)
     meta["live_resolved"] = live_resolved
     if live_resolved:
-        # m3 fix (Zoe 09-01, t_b5acc944): explain the resolved-ticker count —
+        # m3 fix (Zoe 09-01, t_ticket): explain the resolved-ticker count —
         # 09-01 report said "(30 tickers)" with no breakdown (08-28 snapshot
         # had 32; 09-01 universe 31; resolved 30 = snapshot ∩ live daily
         # batch). List what could NOT resolve and why, dynamically.

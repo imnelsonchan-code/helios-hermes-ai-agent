@@ -45,6 +45,46 @@ class FourPathGateTests(unittest.TestCase):
     def setUpClass(cls):
         cls.mod = _load()
 
+    def _challenge(self, text: str) -> Path:
+        """Write a challenge file into a per-test temp dir."""
+        seq = getattr(self, "_challenge_seq", 0) + 1
+        self._challenge_seq = seq
+        d = self.root / "challenges"
+        d.mkdir(parents=True, exist_ok=True)
+        p = d / f"challenge-{seq}.md"
+        p.write_text(text, encoding="utf-8")
+        return p
+
+    def test_verdict_reject_beats_negated_pass(self):
+        """'IC vote: REJECT — does not PASS' must read REJECT, never PASS."""
+        p = self._challenge(
+            "## Zoe challenge\n\nIC vote: REJECT — does not PASS because numbers invent\n"
+        )
+        verdict, note = self.mod._read_verdict(p)
+        self.assertEqual(verdict, "REJECT")
+
+    def test_verdict_blocker_beats_pass_on_same_line(self):
+        p = self._challenge("verdict: PASS requested, final: BLOCKER — geometry drift\n")
+        verdict, note = self.mod._read_verdict(p)
+        self.assertEqual(verdict, "BLOCKER")
+
+    def test_verdict_pass_with_related_reject_word_still_safe(self):
+        """A PASS line mentioning REJECT wording elsewhere reads REJECT (fail-closed)."""
+        p = self._challenge("IC vote: PASSerar; note the term REJECT appears twice\n")
+        verdict, _ = self.mod._read_verdict(p)
+        self.assertEqual(verdict, "REJECT")
+
+    def test_verdict_clean_pass_still_passes(self):
+        p = self._challenge("## Zoe challenge\n\nIC vote: PASS\n")
+        verdict, note = self.mod._read_verdict(p)
+        self.assertEqual(verdict, "PASS")
+        self.assertEqual(note, "PASS")
+
+    def test_verdict_plain_prose_without_vote_line_is_unknown(self):
+        p = self._challenge("## Zoe challenge\n\nLooks fine overall, some numbers invented.\n")
+        verdict, note = self.mod._read_verdict(p)
+        self.assertEqual(verdict, "UNKNOWN")
+
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
         self.root = Path(self._tmp.name)

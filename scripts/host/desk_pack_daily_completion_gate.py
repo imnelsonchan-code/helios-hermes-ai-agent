@@ -38,6 +38,27 @@ def _hermes_home() -> Path:
     return _gate_home() / ".hermes"
 
 
+def _exit_receipt_ok(path: Path | None) -> str | None:
+    """Receipt acceptance: None (no receipt) / 'ok' / 'failed-overlay'.
+
+    The tm-exits receipt records its own outcome (`status: checker_rc=N`).
+    A nonzero N means the exit overlay crashed — acceptance until now only
+    checked file existence, so a failed overlay counted as success-grade
+    completion evidence for the whole pack. Undefeated evidence is required.
+    """
+    if path is None:
+        return None
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("status: checker_rc=") and not stripped.endswith("=0"):
+            return "failed-overlay"
+    return "ok"
+
+
 def _first_nonzero(candidates: list[Path]) -> Path | None:
     for path in candidates:
         if path.is_file() and path.stat().st_size > 0:
@@ -76,17 +97,23 @@ def check(date: str) -> dict:
         inbox / "daily-social", f"{date}*-summary-revised.md"
     )
     exit_ev = _exit_evidence(inbox, date)
+    evidence_state = _exit_receipt_ok(exit_ev)
 
     status = {
         "date": date,
         "market_close": "ok" if market_close else "miss",
         "daily_social": "ok" if daily_social else "miss",
-        "exit_evidence": "ok" if exit_ev else "miss",
+        # 'ok' | 'failed-overlay' (receipt recorded a nonzero checker rc) | 'miss'
+        "exit_evidence": evidence_state if evidence_state is not None else "miss",
         "market_close_path": str(market_close) if market_close else None,
         "daily_social_path": str(daily_social) if daily_social else None,
         "exit_evidence_path": str(exit_ev) if exit_ev else None,
     }
-    if market_close and daily_social and exit_ev:
+    if (
+        market_close
+        and daily_social
+        and evidence_state == "ok"
+    ):
         status["status"] = "complete"
     else:
         status["status"] = "incomplete"

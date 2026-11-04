@@ -20,7 +20,7 @@ bars resampled from the shared daily data cache. This script:
      bars (the NON-CANONICAL smoothing get_regime used before W37 — W36 basis
      printed 18.93 vs canonical 15.09) and flags |ta.adx - canonical| > 1.0.
 
-Incident anchor (W36 B1, Zoe REJECT 2026-09-06, t_0386a1a6):
+Incident anchor (W36 B1, Zoe REJECT 2026-09-06, t_ticket):
   get_regime() ta.adx weekly ADX14 = 18.93  vs  canonical true-Wilder = 15.09
   (cache 2026-09-04 W-FRI basis; diff 3.84 > 1.0 -> FLAG).
 

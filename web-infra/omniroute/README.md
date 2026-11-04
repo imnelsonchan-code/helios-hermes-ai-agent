@@ -14,9 +14,16 @@ Self-hosted OpenAI-compatible gateway under `~/web-infra/omniroute/` on the Herm
 
 ## Deploy from this repo
 
+> **Public-pack note:** `scripts/apply-omniroute.sh` is host-only and not
+> included in this snapshot. To deploy manually: copy this folder to the
+> host, then `cp .env.example .env`, fill the three secrets it lists
+> (generate long randoms for `JWT_SECRET` / `API_KEY_SECRET` /
+> `INITIAL_PASSWORD`), `chmod 600 .env`, create `data/` and `redis-data/`,
+> and run `docker compose up -d`.
+
 ```bash
-./scripts/apply-omniroute.sh --dry-run
-./scripts/apply-omniroute.sh
+./scripts/apply-omniroute.sh --dry-run   # host-only helper, see note above
+./scripts/apply-omniroute.sh             # host-only helper, see note above
 ```
 
 The apply script:

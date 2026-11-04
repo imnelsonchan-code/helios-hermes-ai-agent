@@ -13,6 +13,7 @@ Never blends value sleeve. Never edits Option 6 weights.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -38,7 +39,10 @@ TM_DIRS = [
     Path.home() / ".hermes" / "profiles" / "renee" / "workspace" / "reports" / "daily-trend-momentum",
 ]
 OUT_DIR = Path.home() / ".hermes" / "shared" / "reports" / "renee" / "scoring-eval"
-INBOX_DIR = Path.home() / "workspace" / "reports" / "inbox" / "scoring-eval"
+_out_inbox = os.environ.get(
+    "REPORTS_INBOX", str(Path.home() / "workspace" / "reports" / "inbox")
+)
+INBOX_DIR = Path(_out_inbox) / "scoring-eval"
 PRED_PATH = OUT_DIR / "predictions-tm.jsonl"
 
 

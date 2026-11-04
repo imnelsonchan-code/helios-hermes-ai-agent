@@ -119,7 +119,7 @@ def score_rsi(period_config, rsi_value):
     """
  RSI (0-20) — v4.5 (Eliminate 20-point spike)
 
-    DESIGN DECISION (formally documented — Zoe 2026-09-01 M1, t_b5acc944):
+    DESIGN DECISION (formally documented — Zoe 2026-09-01 M1, t_ticket):
     the RSI sub-score curve is intentionally NON-MONOTONIC. It rewards BOTH
     momentum strength (70-75 sweet spot -> 17-19, highest) AND deep oversold
     (<30 -> 12, mean-reversion sweet spot). This is the validated backtest
@@ -225,7 +225,7 @@ def score_total(scores_dict, weights=None):
     return sum(capped[k] * weights.get(k, 1.0) for k in capped)
 
 def get_signal_bracket(score_total):
-    # 08-20 P1 (Zoe T&M t_85a14c20): round to 1dp before bracket comparison.
+    # 08-20 P1 (Zoe T&M t_ticket): round to 1dp before bracket comparison.
     # Floating-point totals like 59.99999999999999 (TFC, 08-20 stale report)
     # must classify as "60-69", not phantom-migrate to "<60".
     score_total = round(float(score_total), 1)

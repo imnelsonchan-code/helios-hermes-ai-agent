@@ -47,6 +47,13 @@ class ValueVetoTests(unittest.TestCase):
         )
         self.assertTrue(out["allowed_candidate"])
 
+    def test_financial_services_label_skips_interest_coverage(self):
+        """'Financial Services' is the label live renee taxonomy actually emits."""
+        out = evaluate_vetoes(
+            _clean_row(sector="Financial Services", interest_coverage=0.5)
+        )
+        self.assertTrue(out["allowed_candidate"])
+
     def test_mna_skips_dilution(self):
         out = evaluate_vetoes(
             _clean_row(mna_flag=True, share_count_dilution_5y=0.35)

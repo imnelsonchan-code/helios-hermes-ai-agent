@@ -15,8 +15,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -277,30 +279,82 @@ def load_marks(path: str | None, inline: str | None) -> dict[str, float]:
     return out
 
 
+def _norm_date(s: Any) -> str | None:
+    """Extract a ``YYYY-MM-DD`` prefix for horizon comparisons; None if absent."""
+    match = re.match(r"(\d{4}-\d{2}-\d{2})", str(s or "").strip())
+    return match.group(1) if match else None
+
+
 def settle_all(
     predictions: Sequence[Prediction],
     marks: Mapping[str, float],
     *,
     eps: float = DEFAULT_EPS,
+    as_of: str | None = None,
 ) -> SettlementReport:
+    """Settle every prediction; E5 sleeves are never blended.
+
+    Horizon gate (fail-closed): ``as_of`` defaults to today (UTC) when the
+    caller omits it — direct callers settle nothing before the horizon is
+    due. A prediction may only settle once its mark is taken at or after
+    ``horizon_end``; rows that are not yet due, or whose ``horizon_end`` is
+    unparseable, stay ``pending`` (``deferred: ...``) so a later pass retries.
+
+    One-shot lock: rows already ``settled`` (hit recorded) are passed through
+    unchanged — settlement is never re-phased by later marks.
+    """
     settled_preds: list[Prediction] = []
     tm_settled = tm_hits = value_settled = value_hits = 0
+    as_of_date = _norm_date(as_of) or datetime.now(timezone.utc).strftime(
+        "%Y-%m-%d"
+    )
+
+    def _count(pred: Prediction) -> None:
+        nonlocal tm_settled, tm_hits, value_settled, value_hits
+        if pred.status != "settled" or pred.hit is None:
+            return
+        if pred.sleeve == "tm":
+            tm_settled += 1
+            if pred.hit:
+                tm_hits += 1
+        elif pred.sleeve == "value":
+            value_settled += 1
+            if pred.hit:
+                value_hits += 1
 
     for pred in predictions:
+        # One-shot lock: already-settled rows are never re-settled.
+        if pred.status == "settled" and pred.hit is not None:
+            settled_preds.append(pred)
+            _count(pred)
+            continue
+
+        if as_of_date is not None:
+            horizon = _norm_date(pred.horizon_end)
+            if horizon is None:
+                out = Prediction(**asdict(pred))
+                out.status = "pending"
+                out.hit = None
+                out.settle_reason = (
+                    f"deferred: horizon_end unparseable ({pred.horizon_end!r})"
+                )
+                settled_preds.append(out)
+                continue
+            if as_of_date < horizon:
+                out = Prediction(**asdict(pred))
+                out.status = "pending"
+                out.hit = None
+                out.settle_reason = (
+                    f"deferred: before horizon_end {horizon} (as_of {as_of_date})"
+                )
+                settled_preds.append(out)
+                continue
+
         mark = marks.get(pred.ticker)
         entry = pred.entry_price
         result = settle(pred, entry_price=entry, mark_price=mark, eps=eps)
         settled_preds.append(result)
-        if result.status != "settled" or result.hit is None:
-            continue
-        if result.sleeve == "tm":
-            tm_settled += 1
-            if result.hit:
-                tm_hits += 1
-        elif result.sleeve == "value":
-            value_settled += 1
-            if result.hit:
-                value_hits += 1
+        _count(result)
 
     report = SettlementReport(predictions=settled_preds)
     report.tm_settled = tm_settled
@@ -327,13 +381,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--marks", dest="marks_path", help="Ticker mark prices JSON file")
     parser.add_argument("--marks-json", help="Inline ticker mark prices JSON")
     parser.add_argument("--eps", type=float, default=DEFAULT_EPS, help="Flat direction tolerance")
+    parser.add_argument(
+        "--as-of",
+        default=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        help="Marks date (YYYY-MM-DD) for the horizon gate; default: today UTC",
+    )
     parser.add_argument("--out", help="Write JSON report path")
     args = parser.parse_args(list(argv) if argv is not None else None)
 
     try:
         preds = load_predictions(args.predictions)
         marks = load_marks(args.marks_path, args.marks_json)
-        report = settle_all(preds, marks, eps=args.eps)
+        report = settle_all(preds, marks, eps=args.eps, as_of=args.as_of)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"[❌] {exc}", file=sys.stderr)
         return 1

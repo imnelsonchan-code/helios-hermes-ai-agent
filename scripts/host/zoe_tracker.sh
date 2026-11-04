@@ -3,7 +3,19 @@
 # Runs the tracker and only outputs if there are CURRENT unresolved issues
 set -euo pipefail
 
-OUTPUT=$($HOME/.hermes/profiles/renee/.venv/bin/python3 $HOME/.hermes/scripts/zoe_tracker.py --days 14 --items 2>&1) || true
+OUT_RC=0
+OUTPUT="$("$HOME/.hermes/profiles/renee/.venv/bin/python3" "$HOME/.hermes/scripts/zoe_tracker.py" --days 14 --items 2>&1)" || OUT_RC=$?
+
+# A crashed tracker (missing venv, import failure) used to be swallowed by
+# `|| true`: the cron then reported success with no diagnostics. Fail loudly,
+# but keep the legacy "ACTION REQUIRED" path the only way to exit non-zero
+# when the tracker itself can't run.
+if [[ "$OUT_RC" -ne 0 ]]; then
+  echo "$OUTPUT" >&2
+  echo ""
+  echo "[WARN] zoe_tracker.py exited $OUT_RC (venv missing or tracker crash) — no summary produced" >&2
+  exit 0
+fi
 
 # Summary only (first ~8 lines). Telegram on missing revision / stale / orphan.
 # Do not page on "Resolved (w/ items open)" — that is a file-level pass.

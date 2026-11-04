@@ -329,7 +329,7 @@ done
 
 # 5c — shock skeleton + calendar / FMP ban in world
 WORLD="${SKILLS}/world-to-commodity/SKILL.md"
-if [[ -f "$WORLD" ]] && grep -Eq 'shock|Shock|' "$WORLD" \
+if [[ -f "$WORLD" ]] && grep -Eq 'shock|Shock' "$WORLD" \
  && grep -Eq 'FMP|WASDE|EIA' "$WORLD"; then
  ok "world-to-commodity documents shock skeleton + calendar/FMP gate"
 else

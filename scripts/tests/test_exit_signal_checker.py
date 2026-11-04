@@ -69,6 +69,19 @@ class ExitSignalCheckerTests(unittest.TestCase):
         self.assertNotIn("SL", text)
         self.assertNotIn("TP", text)
 
+    def test_open_sell_does_not_reduce_book(self):
+        """A submitted-but-unfilled (OPEN) SELL must not shrink the open book."""
+        rows = [
+            {"Ticker": "OPENSELL", "Action": "BUY", "Shares": "10", "Status": "OPEN", "Date": "2026-01-01"},
+            {"Ticker": "OPENSELL", "Action": "SELL", "Shares": "4", "Status": "OPEN", "Date": "2026-01-05"},
+            {"Ticker": "OPENSELL", "Action": "SELL", "Shares": "3", "Status": "PENDING", "Date": "2026-01-06"},
+            {"Ticker": "OPENSELL", "Action": "SELL", "Shares": "2", "Status": "CLOSED", "Date": "2026-01-07"},
+        ]
+        positions = self.mod.compute_open_book(rows)
+        self.assertEqual(len(positions), 1)
+        # Only the CLOSED sell (2) reduced the book: 10 − 2 = 8.
+        self.assertEqual(positions[0].remaining, 8)
+
     def test_reentry_age_starts_from_current_position_cycle(self):
         rows = [
             {"Ticker": "AAA", "Action": "BUY", "Shares": "10", "Status": "CLOSED", "Date": "2026-01-01"},

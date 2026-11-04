@@ -145,8 +145,9 @@ alternative to a defined partial is not the theoretically optimal full-runner
 policy — it is the owner overriding the system on a bad afternoon. That argues
 for keeping *a* partial while shrinking it, not for deleting it.
 
-Three tranches are rejected: commission and FX drag on a ~£5,000 lot, plus more
-share-allocation edge cases on top of the existing one-share special case.
+Three tranches are rejected: commission and FX drag on a mid-size illustrative
+lot, plus more share-allocation edge cases on top of the existing one-share
+special case.
 
 ## Rejected options
 
@@ -252,12 +253,12 @@ is adopted.
    a single `DailyBar`. The nightly fetch already retrieves, validates and caches
    ~400 calendar days — `_history_start` anchors on
    `min(expected_session, plan_created_session) − 400d`, so **every nightly fetch
-   already covers the entire holding period**. Verified live: a UNH cache file
-   holds 277 bars for a 2026-09-08 fill. Exposing this series is the shared
+   already covers the entire holding period**. Verified live: a cache file
+   held 277 bars for an account fill date well inside that fetch coverage. Exposing this series is the shared
    prerequisite for the trail and for the ledger.
 2. **`tick_size` is hardcoded to 0.01 and wrong for LSE.** `RiskPolicy.tick_size`
    (`risk_plan.py:94`) is a 1 **penny** grid after GBp normalisation. Under MiFID
-   II RTS 11 a liquid name at 605p has a 0.2p tick (0.002 GBP, 5× finer); a 45p
+   II RTS 11 an illustrative liquid LSE name at 605p has a 0.2p tick (0.002 GBP, 5× finer); a 45p
    small-cap has ~0.05p (0.0005 GBP), where 1p rounding distorts levels by up to
    **2.2% of price** — potentially a large fraction of R. The direction is
    conservative for stops (`ROUND_CEILING` toward fill) but pushes targets

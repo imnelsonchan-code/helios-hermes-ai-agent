@@ -34,6 +34,37 @@ class VolCorrSizeTests(unittest.TestCase):
         cap = position_cap_pct(0.15, 0.50)
         self.assertAlmostEqual(cap, 0.20)
 
+    # ── Continuity/monotonicity invariants (the curve used to jump UP at the
+    # 0.30 and 0.50 boundaries, doubling the cap for higher-risk books) ──
+
+    def _vol_mult(self, v):
+        from vol_corr_size import _vol_multiplier
+        return _vol_multiplier(v)
+
+    def test_vol_multiplier_continuous_at_30(self):
+        just_below = self._vol_mult(0.2999)
+        at = self._vol_mult(0.30)
+        # Effectively continuous (any residual step must be DOWN, never up).
+        self.assertGreaterEqual(at, just_below - 1e-3)
+
+    def test_vol_multiplier_continuous_at_50(self):
+        at = self._vol_mult(0.50)
+        above = self._vol_mult(0.5001)
+        #Cap for HIGHER vol must not increase across the boundary.
+        self.assertLessEqual(above, at + 1e-9)
+
+    def test_vol_multiplier_monotone_non_increasing(self):
+        seq = [self._vol_mult(0.10 + 0.01 * i) for i in range(45)]
+        for lo, hi in zip(seq, seq[1:]):
+            self.assertLessEqual(hi, lo + 1e-9)
+
+    def test_extreme_vol_not_larger_than_50pct_cap(self):
+        cap50 = position_cap_pct(0.50, 0.80)
+        cap60 = position_cap_pct(0.60, 0.80)
+        cap80 = position_cap_pct(0.80, 0.80)
+        self.assertLessEqual(cap60, cap50 + 1e-9)
+        self.assertLessEqual(cap80, cap50 + 1e-9)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -171,6 +171,78 @@ class PredictionSettlerTests(unittest.TestCase):
             self.assertEqual(len(self.mod.load_predictions(str(jpath))), 1)
             self.assertEqual(len(self.mod.load_predictions(str(lpath))), 1)
 
+    # ── Horizon gating + one-shot lock (from the P1 review) ──
+
+    def test_before_horizon_stays_pending(self):
+        preds = [self.mod.parse_prediction(
+            {"sleeve": "tm", "ticker": "AAA", "direction": "long",
+             "as_of": "2026-09-01", "horizon_end": "2026-09-10", "entry_price": 100.0}
+        )]
+        report = self.mod.settle_all(preds, {"AAA": 110.0}, as_of="2026-09-05")
+        out = report.predictions[0]
+        self.assertEqual(out.status, "pending")
+        self.assertIsNone(out.hit)
+        self.assertIn("before horizon_end", out.settle_reason)
+        self.assertEqual(report.tm_settled, 0)
+
+    def test_at_horizon_settles(self):
+        preds = [self.mod.parse_prediction(
+            {"sleeve": "tm", "ticker": "AAA", "direction": "long",
+             "as_of": "2026-09-01", "horizon_end": "2026-09-10", "entry_price": 100.0}
+        )]
+        report = self.mod.settle_all(preds, {"AAA": 110.0}, as_of="2026-09-10")
+        self.assertEqual(report.predictions[0].status, "settled")
+        self.assertEqual(report.tm_settled, 1)
+        self.assertEqual(report.tm_hits, 1)
+
+    def test_unparseable_horizon_defers_even_when_mark_available(self):
+        preds = [self.mod.parse_prediction(
+            {"sleeve": "tm", "ticker": "AAA", "direction": "long",
+             "as_of": "2026-09-01", "horizon_end": "not-a-date", "entry_price": 100.0}
+        )]
+        report = self.mod.settle_all(preds, {"AAA": 110.0}, as_of="2026-09-10")
+        out = report.predictions[0]
+        self.assertEqual(out.status, "pending")
+        self.assertIn("unparseable", out.settle_reason)
+
+    def test_already_settled_rows_never_resettle(self):
+        settled = self.mod.parse_prediction(
+            {"sleeve": "tm", "ticker": "AAA", "direction": "long",
+             "as_of": "2026-09-01", "horizon_end": "2026-09-10",
+             "entry_price": 100.0, "status": "settled",
+             "mark_price": 110.0, "hit": True}
+        )
+        # A later pass holding a NEW (worse) mark must not re-phase a hit.
+        report = self.mod.settle_all([settled], {"AAA": 99.0}, as_of="2026-12-01")
+        out = report.predictions[0]
+        self.assertEqual(out.status, "settled")
+        self.assertTrue(out.hit)
+        self.assertEqual(out.mark_price, 110.0)
+        self.assertEqual(report.tm_hit_rate, 1.0)
+
+    def test_recent_horizon_prediction_not_settled_by_cli_default(self):
+        """CLI default as_of=today defers a prediction whose horizon is future-dated."""
+        with tempfile.TemporaryDirectory() as tmp:
+            pred_path = Path(tmp) / "preds.json"
+            out_path = Path(tmp) / "out.json"
+            pred_path.write_text(
+                json.dumps([{
+                    "sleeve": "tm", "ticker": "AAA", "direction": "long",
+                    "as_of": "2026-09-01",
+                    "horizon_end": "2099-01-01",  # far future
+                    "entry_price": 100.0,
+                }]),
+                encoding="utf-8",
+            )
+            rc = self.mod.main([
+                "--predictions", str(pred_path),
+                "--marks-json", json.dumps({"AAA": 105.0}),
+                "--out", str(out_path),
+            ])
+            self.assertEqual(rc, 0)
+            payload = json.loads(out_path.read_text(encoding="utf-8"))
+            self.assertIsNone(payload["tm_hit_rate"])
+
     def test_cli_writes_out_json(self):
         with tempfile.TemporaryDirectory() as tmp:
             pred_path = Path(tmp) / "preds.json"

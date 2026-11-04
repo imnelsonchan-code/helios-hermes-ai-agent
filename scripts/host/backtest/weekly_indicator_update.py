@@ -82,7 +82,7 @@ PERSISTENT_ERROR_TICKERS = {
     "SQ": "yfinance data fetch fails consistently — removed from STOCK_UNIVERSE on 2026-06-28",
 }
 
-# ── Universe config (Zoe W34 #4 / width-scan, t_0b957f77) ──────────
+# ── Universe config (Zoe W34 #4 / width-scan, t_ticket) ──────────
 # STOCK_UNIVERSE above is the FALLBACK baseline. The live universe is read
 # from universe_config.json (base_universe + width_scan_additions), written
 # by width_scan.py --merge. Config-driven — no hardcoded list at runtime.
@@ -687,7 +687,7 @@ def main():
     if not dry_run:
         os.makedirs(REPORTS_DIR, exist_ok=True)
 
-        # Width-scan new discoveries (Zoe W34 #4 / t_0b957f77) — read the latest
+        # Width-scan new discoveries (Zoe W34 #4 / t_ticket) — read the latest
         # scan output written by width_scan.py. Structurally populated from now on.
         new_discovery = []
         new_discovery_status = None

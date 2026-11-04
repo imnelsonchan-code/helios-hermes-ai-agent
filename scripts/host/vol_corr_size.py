@@ -16,6 +16,15 @@ ABS_FLOOR = 0.05
 
 
 def _vol_multiplier(ann_vol: float) -> float:
+    """Continuous, non-increasing vol multiplier (higher vol → smaller cap).
+
+    Segments: <15% → 1.25 · 15–30% → 1.0 → 0.625 · 30–50% → 0.625 → 0.25 ·
+    >50% → hold 0.25 (the multiplier never rises again as vol worsens).
+    Continuous at the 30% and 50% boundaries is a hard invariant — the 0.30
+    boundary previously stepped 0.625 → 0.75 and ABOVE 0.50 stepped 0.25 →
+    0.50, doubling the cap for higher-risk books. The 15% boundary steps
+    1.25 → 1.0 BY DESIGN (the low-vol boost tier ends there).
+    """
     if ann_vol < 0.15:
         return 1.25
     if ann_vol < 0.30:
@@ -23,10 +32,10 @@ def _vol_multiplier(ann_vol: float) -> float:
         t = (ann_vol - 0.15) / 0.15
         return 1.0 - 0.375 * t
     if ann_vol <= 0.50:
-        # linear 0.75 @ 30% -> 0.25 @ 50%
+        # linear 0.625 @ 30% -> 0.25 @ 50% (continuous with the first leg)
         t = (ann_vol - 0.30) / 0.20
-        return 0.75 - 0.50 * t
-    return 0.50
+        return 0.625 - 0.375 * t
+    return 0.25
 
 
 def _corr_multiplier(avg_corr: float) -> float:

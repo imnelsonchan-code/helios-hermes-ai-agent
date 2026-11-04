@@ -69,7 +69,30 @@ def compute_open_book(rows: list[dict]) -> list[OpenBookPosition]:
         status = str(row.get("Status") or "").strip().upper()
         if not ticker or status in SKIP_STATUS:
             continue
-        shares = _to_float(row.get("Shares")) or 0.0
+        # Only a CLOSED (executed) SELL may reduce the book — an OPEN/PENDING
+        # SELL has not filled yet (same rule as position_watch and
+        # risk_plan._attributed_sells). BUY rows keep the SKIP_STATUS-only
+        # rule: a live OPEN BUY marks an open position, not an unfilled order.
+        if action == "SELL" and status != "CLOSED":
+            continue
+        shares_raw = str(row.get("Shares") or "").strip()
+        shares = _to_float(row.get("Shares"))
+        if (
+            shares is None
+            and shares_raw
+            and status not in SKIP_STATUS
+            and action in ("BUY", "SELL")
+        ):
+            # A silently-vanished SELL over-states the open book (the old
+            # `or 0.0` treated junk shares as a no-op fill). Print loudly,
+            # keep the row out of the book math.
+            print(
+                f"[exit-checker] unparsable Shares on eligible row: "
+                f"{ticker} {action} {shares_raw!r}",
+                file=sys.stderr,
+            )
+        if shares is None:
+            shares = 0.0
         if shares <= 0:
             continue
         if action == "BUY":

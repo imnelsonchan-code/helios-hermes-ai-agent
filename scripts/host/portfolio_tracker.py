@@ -5,9 +5,13 @@ Portfolio P&L Tracker + Backtest vs Live Reconciliation — v1.3 (2026-09-14)
 Part 1 — Portfolio P&L:
   1. Reads trade_journal.csv
   2. Skips VOID/VOIDED/CANCELLED/CANCEL/PENDING/REVERSED rows
-  3. Cost basis = Shares × Price (not the unreliable GBP Amount column)
+  3. Cost basis = Shares × native fill price (not the unreliable GBP Amount
+     column; USD fills resolve from `Price USD` / `Total USD`, GBP rows
+     from `Price`)
   4. GBP-native rows (empty/zero Total USD) convert at GBP->USD; USD-native
      rows get a GBP companion at the same rate. Report shows both together.
+     Mixed GBP+USD tickers are flagged; rows without a resolvable price are
+     excluded and surfaced, never silently dropped.
   5. Partial sells leave remaining shares OPEN (e.g. TST1.L 32)
   6. Silent when healthy; Telegram on drawdown >8%. Win-rate vs backtest
      only alerts when closed-trade n ≥ 10.
@@ -93,11 +97,54 @@ def _to_float(val):
 
 
 def _has_usd(row: dict) -> bool:
-    raw = (row.get("Total USD") or "").strip()
-    if not raw:
-        return False
-    val = _to_float(raw)
-    return bool(val)
+    """USD fill indicator: positive `Total USD` or positive `Price USD`.
+
+    Mirrors risk_plan.parse_journal_fill: never treats a GBP amount as USD
+    (a `0` in `Total USD` stays GBP-native).
+    """
+    for col in ("Total USD", "Price USD"):
+        raw = (row.get(col) or "").strip()
+        if raw:
+            val = _to_float(raw)
+            if val:
+                return True
+    return False
+
+
+def _row_price_ccy(row: dict):
+    """Resolve ``(price, currency)`` for one journal fill row.
+
+    USD fills take the native per-share price: `Price USD` if present, else
+    `Total USD / Shares`. The stale GBP `Price` column must never fabricate a
+    USD fill price — position_watch and risk_plan already resolve USD fills
+    this way (live journals can carry a stale `Price` on USD rows).
+    GBP-native rows (no positive `Total USD` / `Price USD`) use `Price`.
+
+    Returns ``(None, ccy)`` when no price can be resolved; the caller must
+    exclude such rows and surface the exclusion, never skip silently.
+    """
+    shares = _to_float(row.get("Shares")) or 0.0
+    total_raw = (row.get("Total USD") or "").strip()
+    usd_raw = (row.get("Price USD") or "").strip()
+    total_usd = _to_float(total_raw) if total_raw else 0.0
+    if (total_usd and total_usd > 0) or usd_raw:
+        if usd_raw:
+            px = _to_float(usd_raw)
+            if px is not None and px > 0:
+                return px, "USD"
+            # `Price USD` present but unusable ("0"/junk): fall back to
+            # Total USD / Shares like position_watch._native_price before
+            # declaring the row unresolved.
+            if shares > 0 and total_usd > 0:
+                return total_usd / shares, "USD"
+            return None, "USD"
+        if shares > 0:
+            return total_usd / shares, "USD"
+        return None, "USD"
+    px = _to_float(row.get("Price"))
+    if px is None or px <= 0:
+        return None, "GBP"
+    return px, "GBP"
 
 
 def _native_ccy(buy_rows: list[dict], sell_rows: list[dict]) -> str:
@@ -111,7 +158,14 @@ def compute_pnl(rows: list[dict], gbp_usd_rate: float = DEFAULT_GBP_USD) -> dict
     """Per-ticker realized P&L with USD and GBP companions.
 
     VOID-class Status rows are excluded. Remaining shares (buy − sell) stay
-    OPEN. Notionals are Shares × Price; GBP Amount is never summed.
+    OPEN. Notionals are Shares × native fill price: USD rows resolve from
+    `Price USD` or `Total USD`/`Shares` (the stale GBP `Price` column is never
+    used to price a USD fill — position_watch and risk_plan resolve USD fills
+    the same way), GBP rows from `Price`. GBP Amount is never summed.
+    A ticker with both GBP and USD fills converts through one FX rate and is
+    flagged ``native_ccy="MIXED"`` / ``mixed_ccy: true``; rows with no
+    resolvable price are excluded and counted in ``unresolved_rows`` (never
+    silently dropped). Mixed books require ``gbp_usd_rate > 0``.
     """
     buys = defaultdict(list)
     sells = defaultdict(list)
@@ -133,35 +187,71 @@ def compute_pnl(rows: list[dict], gbp_usd_rate: float = DEFAULT_GBP_USD) -> dict
     for ticker in sorted(set(buys) | set(sells)):
         buy_rows = buys.get(ticker, [])
         sell_rows = sells.get(ticker, [])
-        native = _native_ccy(buy_rows, sell_rows)
-
         buy_shares = 0.0
-        buy_native = 0.0
+        buy_val = {"GBP": 0.0, "USD": 0.0}
+        buy_ccys = set()
+        unresolved_buys = 0
         for b in buy_rows:
             sh = _to_float(b.get("Shares")) or 0.0
-            px = _to_float(b.get("Price"))
+            px, ccy = _row_price_ccy(b)
             if px is None:
+                unresolved_buys += 1
                 continue
             buy_shares += sh
-            buy_native += sh * px
-        entry = buy_native / buy_shares if buy_shares else 0.0
+            buy_val[ccy] += sh * px
+            buy_ccys.add(ccy)
+        buy_native = 0.0
 
         sell_shares = 0.0
-        sell_native = 0.0
+        sell_val = {"GBP": 0.0, "USD": 0.0}
+        sell_ccys = set()
+        unresolved_sells = 0
         for s in sell_rows:
             sh = _to_float(s.get("Shares")) or 0.0
-            px = _to_float(s.get("Price"))
+            px, ccy = _row_price_ccy(s)
             if px is None:
+                unresolved_sells += 1
                 continue
             sell_shares += sh
-            sell_native += sh * px
+            sell_val[ccy] += sh * px
+            sell_ccys.add(ccy)
+
+        ccys = buy_ccys | sell_ccys
+        unresolved_rows = unresolved_buys + unresolved_sells
+        mixed_ccy = len(ccys) > 1
+
+        rate = gbp_usd_rate if (gbp_usd_rate and gbp_usd_rate > 0) else None
+        if not rate:
+            # A zero/invalid rate cannot convert GBP<->USD; legacy behavior
+            # silently produced 0.0 companions. Fine for a single-currency
+            # book with no cross-currency rows — but mixed books must fail.
+            if mixed_ccy:
+                raise ValueError(
+                    f"{ticker}: mixed-currency fills require gbp_usd_rate > 0"
+                )
+            rate = DEFAULT_GBP_USD
+
+        # Aggregate into one native space.
+        if mixed_ccy:
+            native = "MIXED"
+            buy_val_usd_space = buy_val["USD"] + buy_val["GBP"] * rate
+            sell_val_usd_space = sell_val["USD"] + sell_val["GBP"] * rate
+            buy_native = buy_val_usd_space
+            sell_native = sell_val_usd_space
+        else:
+            native = next(iter(ccys)) if ccys else "GBP"
+            buy_native = buy_val[native]
+            sell_native = sell_val[native]
+        entry = buy_native / buy_shares if buy_shares else 0.0
 
         remaining = buy_shares - sell_shares
         realized_cost = sell_shares * entry
         realized_pnl_native = sell_native - realized_cost
         status = "CLOSED" if remaining <= 0 else "OPEN"
 
-        if native == "GBP":
+        # MIXED positions were unified into USD space above.
+        pnl_space = "USD" if native == "MIXED" else native
+        if pnl_space == "GBP":
             buy_gbp = realized_cost
             sell_gbp = sell_native
             pnl_gbp = realized_pnl_native
@@ -185,6 +275,8 @@ def compute_pnl(rows: list[dict], gbp_usd_rate: float = DEFAULT_GBP_USD) -> dict
             "remaining_shares": int(round(remaining)) if remaining > 0 else 0,
             "realized_shares": int(round(sell_shares)),
             "native_ccy": native,
+            "mixed_ccy": mixed_ccy,
+            "unresolved_rows": unresolved_rows,
             "buy_usd": round(buy_usd, 2),
             "sell_usd": round(sell_usd, 2),
             "pnl_usd": round(pnl_usd, 2),
@@ -433,6 +525,26 @@ def write_report(
                 )
         lines.append("")
 
+    data_quality = [
+        (t, d) for t, d in sorted(pnl.items())
+        if d.get("mixed_ccy") or d.get("unresolved_rows")
+    ]
+    if data_quality:
+        lines.append("## Data-quality warnings")
+        lines.append("")
+        for t, d in data_quality:
+            if d.get("mixed_ccy"):
+                lines.append(
+                    f"- ⚠️ {t}: mixed GBP/USD fills — GBP legs converted at "
+                    f"{gbp_usd_rate:.4f}; entry is an FX-converted average."
+                )
+            if d.get("unresolved_rows"):
+                lines.append(
+                    f"- ⚠️ {t}: {d['unresolved_rows']} journal row(s) had no "
+                    f"resolvable price and were excluded from P&L."
+                )
+        lines.append("")
+
     lines.append("## Backtest vs Live Reconciliation")
     lines.append("")
     lines.append(f"**Backtest baseline:** v2.3 win rate = {BACKTEST_BASELINE_WR:.1%}")
@@ -467,7 +579,8 @@ def write_report(
     lines.append("")
     lines.append(
         f"> FX: USD-native P&L converted to GBP (and GBP-native to USD) at "
-        f"**{gbp_usd_rate:.4f}**. Cost basis is Shares × Price; journal "
+        f"**{gbp_usd_rate:.4f}**. Cost basis is Shares × native fill price "
+        f"(USD rows: `Price USD` / `Total USD`; GBP rows: `Price`); journal "
         f"`GBP Amount` is not used."
     )
     lines.append("")
@@ -520,7 +633,13 @@ def main():
         print("[⚠] No journal data — nothing to track", file=sys.stderr)
         return 0
 
-    pnl = compute_pnl(rows, gbp_usd_rate=args.gbp_usd)
+    try:
+        pnl = compute_pnl(rows, gbp_usd_rate=args.gbp_usd)
+    except ValueError as exc:
+        # e.g. mixed-currency fills with --gbp-usd 0: a clean CLI error beats
+        # a raw traceback (a zero rate stays valid for single-ccy books).
+        print(f"[❌] {exc}", file=sys.stderr)
+        return 1
     summary = compute_portfolio_summary(pnl)
     spy = fetch_spy_benchmark()
 
@@ -547,6 +666,12 @@ def main():
         alerts.append(
             f"🚨 PORTFOLIO DRAWDOWN: {dd:.1%} (threshold: {DRAWDOWN_ALERT_THRESHOLD:.0%})"
         )
+
+    for t, d in sorted(pnl.items()):
+        if d.get("mixed_ccy"):
+            alerts.append(f"⚠️ {t}: mixed GBP/USD fills — P&L uses FX-converted entries at {args.gbp_usd}")
+        if d.get("unresolved_rows"):
+            alerts.append(f"⚠️ {t}: {d['unresolved_rows']} journal row(s) without a resolvable price (excluded from P&L)")
 
     if summary["total_closed_trades"] >= WR_MIN_CLOSED:
         wr_divergence = abs(summary["win_rate"] / 100 - BACKTEST_BASELINE_WR)

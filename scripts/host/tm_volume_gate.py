@@ -81,16 +81,27 @@ def _effective_bracket(row: dict) -> str:
     return "NO_SIGNAL"
 
 
-def apply_volume_gate(row: dict) -> tuple[str, str | None]:
-    """Return (bracket, reason). Demotes BUY->WATCH when volume fails."""
+def apply_volume_gate(
+    row: dict,
+    *,
+    threshold: float = DEFAULT_VOLUME_THRESHOLD,
+    min_ratio: float = DEFAULT_MIN_RATIO,
+) -> tuple[str, str | None]:
+    """Return (bracket, reason). Demotes BUY->WATCH when volume fails.
+
+    ``threshold``/``min_ratio`` reach the actual demotion decision (they only
+    drive ``volume_confirmed``; the CLI overrides were silently ignored here).
+    """
     bracket = _effective_bracket(row)
     if bracket != "BUY":
         return bracket, None
-    if volume_confirmed(row):
+    if volume_confirmed(row, threshold=threshold, min_ratio=min_ratio):
         return bracket, None
-    return "WATCH", "volume_gate: confirmation failed (ratio<=1.0 and volume<12)"
-
-
+    return (
+        "WATCH",
+        f"volume_gate: confirmation failed (ratio<= {min_ratio:g} and "
+        f"volume leg score< {threshold:g} of 20)",
+    )
 def apply_volume_gate_to_rows(rows: list[dict]) -> list[dict]:
     out: list[dict] = []
     for row in rows:
@@ -139,7 +150,12 @@ def main(argv: list[str] | None = None) -> int:
             confirmed = True
         else:
             confirmed = False
-        bracket, reason = apply_volume_gate(item)
+        # Thread the CLI overrides into the demotion itself (they only
+        # reported a flag before; BUY rows could stay BUY while the run said
+        # volume_confirmed: false).
+        bracket, reason = apply_volume_gate(
+            item, threshold=args.threshold, min_ratio=args.min_ratio
+        )
         item["volume_confirmed"] = confirmed
         item["effective_bracket"] = bracket
         if reason:

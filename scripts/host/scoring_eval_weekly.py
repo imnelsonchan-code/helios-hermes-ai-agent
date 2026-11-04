@@ -76,7 +76,21 @@ def _rewrite_jsonl(path: Path, updates: dict[tuple[str, str, str], dict]) -> Non
                 str(row.get("as_of") or "")[:10],
             )
             if key in updates:
-                row = {**row, **updates[key]}
+                # One-shot lock (mirrors settle_all): a row whose settlement
+                # is already recorded must never be rewritten by a
+                # duplicate-key update from a different emission of the same
+                # (sleeve, ticker, as_of) — the last settled row's update used
+                # to win and silently erase the locked hit.
+                if (
+                    str(row.get("status") or "") in ("settled", "invalid")
+                    and row.get("hit") is not None
+                ):
+                    print(
+                        "[scoring_eval_weekly] locked row "
+                        f"{key}: duplicate-key update not applied"
+                    )
+                else:
+                    row = {**row, **updates[key]}
             lines_out.append(json.dumps(row, ensure_ascii=False))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines_out) + ("\n" if lines_out else ""), encoding="utf-8")
@@ -148,7 +162,10 @@ def _forward_returns(tickers: list[str], as_of: date, days: int) -> dict[str, fl
     return out
 
 
-def _marks_for_tickers(tickers: list[str]) -> dict[str, float]:
+def _marks_for_tickers(
+    tickers: list[str],
+    mark_dates: dict[str, str] | None = None,
+) -> dict[str, float]:
     try:
         import yfinance as yf
     except ImportError:
@@ -159,7 +176,13 @@ def _marks_for_tickers(tickers: list[str]) -> dict[str, float]:
             hist = yf.Ticker(ticker).history(period="5d", auto_adjust=True)
             if hist is None or hist.empty:
                 continue
-            marks[ticker] = float(hist["Close"].dropna().iloc[-1])
+            close = hist["Close"].dropna()
+            if close.empty:
+                continue
+            marks[ticker] = float(close.iloc[-1])
+            if mark_dates is not None:
+                # Quote date (YYYY-MM-DD) of the fetched mark.
+                mark_dates[ticker] = str(hist.index[-1])[:10]
         except Exception:  # noqa: BLE001
             continue
     return marks
@@ -317,8 +340,6 @@ def main() -> int:
             if end and end <= today.isoformat():
                 pending.append(row)
     if pending:
-        tickers = sorted({str(p.get("ticker") or "").upper() for p in pending if p.get("ticker")})
-        marks = _marks_for_tickers(tickers)
         preds = []
         for raw in pending:
             try:
@@ -326,31 +347,53 @@ def main() -> int:
             except (TypeError, ValueError) as exc:
                 print(f"[scoring_eval_weekly] skip pred: {exc}")
         if preds:
-            report = settle_all(preds, marks)
-            summary["settlement"] = {
-                "tm_hit_rate": report.tm_hit_rate,
-                "value_hit_rate": report.value_hit_rate,
-                "tm_settled": report.tm_settled,
-                "value_settled": report.value_settled,
-            }
-            updates: dict[tuple[str, str, str], dict] = {}
-            for settled in report.predictions:
-                key = (settled.sleeve, settled.ticker, settled.as_of)
-                updates[key] = {
-                    "status": settled.status,
-                    "hit": settled.hit,
-                    "mark_price": settled.mark_price,
-                    "return_pct": settled.return_pct,
-                    "settle_reason": settled.settle_reason,
+            marks: dict[str, float] = {}
+            mark_dates: dict[str, str] = {}
+            marks = _marks_for_tickers(tickers, mark_dates)
+            # F3 gate: settlement locks hit/return permanently, so the mark
+            # itself must be dated at or after horizon_end. yfinance's last
+            # 5d close can predate the horizon (Monday-morning run, mid-week
+            # holiday) — settling against it would lock an
+            # incomplete-horizon result. Undated/missing marks keep the old
+            # path (settle_all defers: missing mark_price).
+            gated = []
+            for pred in preds:
+                horizon = str(pred.horizon_end or "")[:10]
+                quote = mark_dates.get(pred.ticker)
+                if quote and horizon and quote < horizon:
+                    print(
+                        f"[scoring_eval_weekly] defer {pred.sleeve}/{pred.ticker} "
+                        f"as_of={pred.as_of}: mark quote {quote} predates "
+                        f"horizon_end {horizon}"
+                    )
+                    continue
+                gated.append(pred)
+            if gated:
+                report = settle_all(gated, marks, as_of=today.isoformat())
+                summary["settlement"] = {
+                    "tm_hit_rate": report.tm_hit_rate,
+                    "value_hit_rate": report.value_hit_rate,
+                    "tm_settled": report.tm_settled,
+                    "value_settled": report.value_settled,
                 }
-            _rewrite_jsonl(TM_PRED, {k: v for k, v in updates.items() if k[0] == "tm"})
-            _rewrite_jsonl(VAL_PRED, {k: v for k, v in updates.items() if k[0] == "value"})
-            settle_path = OUT_DIR / f"{today.isoformat()}-settlement.json"
-            _publish(settle_path, summary["settlement"])
-            print(
-                f"[scoring_eval_weekly] settle tm_hit={report.tm_hit_rate} "
-                f"value_hit={report.value_hit_rate}"
-            )
+                updates: dict[tuple[str, str, str], dict] = {}
+                for settled in report.predictions:
+                    key = (settled.sleeve, settled.ticker, settled.as_of)
+                    updates[key] = {
+                        "status": settled.status,
+                        "hit": settled.hit,
+                        "mark_price": settled.mark_price,
+                        "return_pct": settled.return_pct,
+                        "settle_reason": settled.settle_reason,
+                    }
+                _rewrite_jsonl(TM_PRED, {k: v for k, v in updates.items() if k[0] == "tm"})
+                _rewrite_jsonl(VAL_PRED, {k: v for k, v in updates.items() if k[0] == "value"})
+                settle_path = OUT_DIR / f"{today.isoformat()}-settlement.json"
+                _publish(settle_path, summary["settlement"])
+                print(
+                    f"[scoring_eval_weekly] settle tm_hit={report.tm_hit_rate} "
+                    f"value_hit={report.value_hit_rate}"
+                )
 
     out_path = OUT_DIR / f"{today.isoformat()}-weekly-eval.json"
     _publish(out_path, summary)

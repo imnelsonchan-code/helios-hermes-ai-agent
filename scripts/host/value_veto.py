@@ -12,7 +12,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
-FINANCIAL_SECTORS = frozenset({"Banks", "Financials", "Insurance"})
+FINANCIAL_SECTORS = frozenset(
+    {"Banks", "Financials", "Financial Services", "Insurance"}
+)
 
 
 def _to_float(value: Any) -> float | None:

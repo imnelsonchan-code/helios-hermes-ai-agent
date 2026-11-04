@@ -73,9 +73,10 @@ PY
  echo " ✅ OPEN , exit "
     exit_status="no-OPEN-skip"
   else
-    if ! out="$("$PY" "$EXIT_CHECKER" --dry-run 2>&1)"; then
-      checker_rc=$?
-    fi
+    # NOTE: `|| rc=$?` (not `if ! cmd; then rc=$?`) — inside a negated-if
+    # body `$?` is always 0, which used to report a crashed checker as OK.
+    checker_rc=0
+    out="$("$PY" "$EXIT_CHECKER" --dry-run 2>&1)" || checker_rc=$?
     echo "$out" | head -40
     if [[ "$checker_rc" -ne 0 ]]; then
  echo " ⚠️ exit_signal_checker exited $checker_rc( journal)"
@@ -88,7 +89,10 @@ PY
 
   echo "-------------"
  echo "📋 "
-  OPEN_COUNT="$(grep -c ",OPEN," "$JOURNAL" 2>/dev/null || echo 0)"
+  # grep -c already prints 0 on no-match; `|| true` only swallows the rc
+  # (the old `|| echo 0` appended a second "0" line to the count).
+  OPEN_COUNT="$(grep -c ",OPEN," "$JOURNAL" 2>/dev/null || true)"
+  [[ "$OPEN_COUNT" ]] || OPEN_COUNT=0
  echo " : ${OPEN_COUNT} "
   TODAY_BUYS="$("$PY" - "$REPORT_DIR" <<'PY' 2>/dev/null || echo "?"
 import glob, json, sys
@@ -110,7 +114,7 @@ cat "$TMP"
 
 # Desk Pack completion-gate receipt (post-step evidence; not from 23:00 position-watch).
 DATE_UTC="$(date -u +%Y-%m-%d)"
-RECEIPT_DIR="${TM_EXITS_RECEIPT_DIR:-$HOME/workspace/reports/inbox/desk-pack-exit}"
+RECEIPT_DIR="${TM_EXITS_RECEIPT_DIR:-${REPORTS_INBOX:-$HOME/workspace/reports/inbox}/desk-pack-exit}"
 RECEIPT="${RECEIPT_DIR}/${DATE_UTC}-tm-exits.md"
 if mkdir -p "$RECEIPT_DIR" 2>/dev/null \
   && printf '%s\n' \

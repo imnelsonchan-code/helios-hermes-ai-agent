@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""fedwatch_daily_fetch.py — Daily CME FedWatch probability auto-fetch (W34 P1, t_3e2a22f1).
+"""fedwatch_daily_fetch.py — Daily CME FedWatch probability auto-fetch (W34 P1, t_ticket).
 
 REPO MIRROR (path-regression only): live host owns cron job <fedwatch-daily-job-id>.
 Do NOT invent an alternate BASE — keep alice/fedwatch as SSOT.

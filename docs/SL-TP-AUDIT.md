@@ -31,7 +31,7 @@ increase dollar risk. Targets round ceiling-to-tick away from fill. Plan 50%
 of the original whole shares for TP1 (rounded down) and all remaining shares
 for TP2. A one-share position has no TP1 quantity.
 
-GOOGL fixture check: `F=336.32`, `A=8.65` → `R=12.975` →
+ACME fixture check: `F=336.32`, `A=8.65` → `R=12.975` →
 `SL0=323.35`, `TP1=362.27`, `TP2=388.22`.
 
 Shadow/adopt-only `atr-zone-v1` adds 1C+2D congestion support for new
@@ -54,7 +54,8 @@ The daily T&M pack's `Entry = close + 0.5A` levels are proposals for a new
 entry. Their absolute `stop_loss` and `take_profit` values must not overwrite
 an already-filled position's plan.
 
-NAV advisory gates (file-only, GBP book vs £50,000 default): lot 0.5%,
+NAV advisory gates (file-only, GBP book vs an example £50,000 default — a
+software default, not real holdings): lot 0.5%,
 book 3%, sector 1.5%, stress-gap 5%. They never place orders.
 
 ## Lifecycle
@@ -203,10 +204,10 @@ python3 ~/.hermes/scripts/risk_plan_migrate.py \
 Force legacy geometry with `--policy atr-r-v2`. Zone widen (`atr-zone-v1`) is
 **never** the default — use `--policy atr-zone-v1` explicitly.
 
-**Residual ops (GOOGL 2026-09-16):** sidecar plan is `atr-chandelier-v1`
-SL0=`324.15` / TP1=`360.68`. Journal row was aligned the same day to those
-levels (TP2 unused placeholder = TP1). **Broker** static stop must still be
-confirmed at SL0 `324.15` (Hermes does not place broker orders). Nightly
+**Residual ops (synthetic example):** a sidecar plan is `atr-chandelier-v1`
+with its policy-computed SL0 / TP1. A journal row aligned the same
+day to those levels (TP2 unused placeholder = TP1). **Broker** static stop must
+still be confirmed at SL0 (Hermes does not place broker orders). Nightly
 `PROPOSED_TRAIL` stays file-only until owner `--trail`.
 
 After the owner amends the broker static stop to match a nightly

@@ -52,7 +52,6 @@ from risk_plan import (  # noqa: E402
     trail_exit_triggered,
 )
 from time_stop import (  # noqa: E402
-    TIME_STOP_LATCH_PATH,
     latch_key,
     mark_time_stop_latched,
     mfe_close_r_from_bars,
@@ -88,9 +87,16 @@ INBOX_DIR = os.path.join(_reports_inbox(), "position-watch")
 RISK_PLAN_PATH = os.path.join(_HERMES, "risk_plans.json")
 MARKET_CACHE_DIR = os.path.join(_HERMES, "shared/audit/market-data")
 ALERT_STATE_PATH = os.path.join(_HERMES, "shared/audit/position-watch-alerts.json")
-TIME_STOP_LATCH_DEFAULT = TIME_STOP_LATCH_PATH
 
 SKIP_STATUS = ("VOID", "VOIDED", "CANCELLED", "CANCEL", "PENDING", "REVERSED")
+# position-watch is a file-only, non-alerting *report* leg; it must never
+# consume (or latch keys into) the shared latch owned by the 22:15 alerting
+# exit Signal Checker — a key latched here at 23:00 would fail-closed silence
+# that night's real 22:15 alert forever. Separate latch namespace per job.
+TIME_STOP_LATCH_REPORT = os.path.expanduser(
+    "~/.hermes/shared/audit/time-stop-latch-position-watch.json"
+)
+TIME_STOP_LATCH_DEFAULT = TIME_STOP_LATCH_REPORT
 ACK = "PARTIAL_EXIT_ACK"
 KELLY_OVERRIDE = "KELLY_OVERRIDE"
 DEFAULT_GBP_USD = 1.31

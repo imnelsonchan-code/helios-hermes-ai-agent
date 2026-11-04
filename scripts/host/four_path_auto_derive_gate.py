@@ -251,13 +251,23 @@ def _read_verdict(challenge_path: Path) -> Tuple[str, str]:
         if verdict in ("PASS", "CONDITIONAL", "PARTIAL", "REJECT", "BLOCKER", "MAJOR", "UNKNOWN"):
             severity = str(data.get("severity", "")).upper()
             return verdict, f"{verdict} / {severity}"
-    keywords = ("PASS", "CONDITIONAL", "PARTIAL", "REJECT", "BLOCKER")
+    keywords = ("PASS", "PARTIAL", "CONDITIONAL", "MAJOR", "REJECT", "BLOCKER")
     for line in text.splitlines():
         low = line.lower()
         if "ic vote" in low or ("verdict" in low and ":" in line):
-            for kw in keywords:
-                if re.search(rf"\b{kw}\b", line, re.IGNORECASE):
-                    return kw, kw
+            hits = [
+                kw for kw in keywords
+                if re.search(rf"\b{kw}\b", line, re.IGNORECASE)
+            ]
+            if hits:
+                # Severity-ranked, most severe wins: a negation like
+                # "IC vote: REJECT — does not PASS because numbers invent"
+                # must never read as PASS. Fail-closed: unknown → no PASS.
+                kw = max(hits, key=lambda k: keywords.index(k))
+                note = kw
+                if len(hits) > 1:
+                    note = f"{kw} (contradictory keywords on vote line: {', '.join(sorted(hits))})"
+                return kw, note
     return "UNKNOWN", "no verdict found"
 
 

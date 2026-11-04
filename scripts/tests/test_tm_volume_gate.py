@@ -58,6 +58,13 @@ class TmVolumeGateTests(unittest.TestCase):
         bracket, _ = apply_volume_gate(row)
         self.assertEqual(bracket, "BUY")
 
+    def test_tight_cli_threshold_demotes_rows_that_default_keeps(self):
+        """Regression: CLI --threshold/--min-ratio reach the demotion itself."""
+        row = _buy_row(volume_ratio=1.3)  # passes default min_ratio (1.0)
+        bracket, reason = apply_volume_gate(row, threshold=+20.0, min_ratio=1.5)
+        self.assertEqual(bracket, "WATCH")
+        self.assertIn("ratio<= 1.5", reason or "")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -150,7 +150,7 @@ class PositionWatchTests(unittest.TestCase):
         self.assertIsNone(empty.sl)
         self.assertEqual(empty.tp1, 22.0)
 
-    def test_join_tm_unh_last_and_score_googl_na_tst1_na(self):
+    def test_join_tm_last_and_score_na_tst1_na(self):
         positions = self.mod.compute_open_positions(self.rows, gbp_usd_rate=1.31)
         self.mod.join_tm(positions, {"BETA": {"tm_score": 58.4, "last": 400.84}})
         by = {p.ticker: p for p in positions}
