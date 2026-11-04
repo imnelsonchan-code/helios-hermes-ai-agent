@@ -119,13 +119,126 @@ Local per-profile `MEMORY.md` stays the agent scratchpad. [`sync_memory_to_ov.py
 
 ## Architecture
 
-```text
-Docker: OpenViking · SearXNG · Browserless · Crawl4AI · reports-server
-                │
-Hermes cron (Sarah) → Kanban specialists → Zoe IC gate → *-revised.md
-                │                              │
-         sync_memory_to_ov              sync_reports_www → /reports/
+### Desk flow
+
+```mermaid
+flowchart TB
+    subgraph SCHED["⏰ Hermes cron — Sarah orchestrates (semantic catalog: fixtures/cron-catalog.yaml)"]
+        T1["Desk Pack daily · Mon–Fri ~21:25<br/>rates ∥ T&M → commodities ∥ value → Alice overall"]
+        T2["Desk Pack weekly · Sun ~12:00"]
+        T3["S1 self-review · Sat ~12:00"]
+        T4["scoring eval · weekly settlement · position-risk train"]
+        T5["every 5–30 min: kanban monitor · portal sync · memory sync · watchdogs"]
+    end
+
+    subgraph DESK["Desk Pack train — Draft → Zoe challenge → owner revises"]
+        R1["Renee — P-TM"]
+        L1["Eliza — P-VAL"]
+        C1["Christina — rates session"]
+        E1["Emily — commodities"]
+        A1["Alice — market close · overall"]
+        ZOE{{"Zoe IC gate<br/>challenge only — never writes *-revised.md"}}
+        REV["*-revised.md → reports/inbox"]
+        R1 --> ZOE
+        L1 --> ZOE
+        C1 --> ZOE
+        E1 --> ZOE
+        A1 --> ZOE
+        ZOE --> REV
+    end
+
+    subgraph HELP["scripts/host — data · scoring · risk (read-only helpers)"]
+        W1["P-TM: daily_trend_momentum ·<br/>ADX/Wilder · tm_volume_gate"]
+        W2["P-VAL: width scan · value_veto ·<br/>fcf_fv_bands · WoW guard"]
+        FED["fedwatch_daily_fetch mirror"]
+        JRN[("trade_journal.csv")]
+        W3["risk_plan · position_watch ·<br/>exit_signal_checker · time_stop"]
+        W4["portfolio_tracker · journal_integrity ·<br/>prediction sleeves"]
+    end
+
+    subgraph PUB["Publishing — every ~30 min"]
+        WWW["sync_reports_www.sh<br/>atomic copy · archive prune"]
+        MEM["sync_memory_to_ov.py"]
+    end
+
+    subgraph INFRA["web-infra — Docker Compose templates"]
+        NG["reports-server<br/>nginx :8080 → /reports/"]
+        OVDB[("OpenViking<br/>vector memory · 127.0.0.1:1933")]
+        AUX["SearXNG · Browserless ·<br/>Crawl4AI · omniroute"]
+    end
+
+    SCHED -->|"starts trains"| DESK
+    SCHED -->|"runs fetch · scoring · risk helpers"| HELP
+    HELP -->|"bars · FedWatch mirror · width/TM scores feed the drafts"| DESK
+    JRN --> W3
+    JRN --> W4
+
+    REV -->|"when published"| WWW
+    WWW -->|"atomic publish"| NG
+    MEM -->|"viking://user/{profile}/… fixed URIs"| OVDB
 ```
+
+### Runtime infrastructure
+
+```mermaid
+flowchart LR
+    subgraph CRONJOBS["hermes cron jobs"]
+        SYNC["portal-sync-www"]
+        MEMOV["memory-sync-ov"]
+        KC["kanban monitor · watchdogs"]
+    end
+
+    SESSIONS["Hermes agent sessions"]
+
+    subgraph WEBINFRA["web-infra — Docker Compose templates"]
+        NG["nginx reports-server<br/>:8080 → /reports/"]
+        OV[("OpenViking<br/>:1933 · X-API-Key")]
+        SX["SearXNG<br/>:8888 search"]
+        BL["Browserless<br/>:9222 headless Chrome"]
+        C4["Crawl4AI<br/>:11235 crawl API"]
+        OM["omniroute<br/>:20128 free-model router (optional)"]
+    end
+
+    SYNC -->|"atomic publish"| NG
+    MEMOV -->|"forget-then-create upserts"| OV
+    SESSIONS -->|"web search"| SX
+    SESSIONS -->|"browser tools"| BL
+    SESSIONS -->|"crawl / extract"| C4
+    SESSIONS -.->|"model routing"| OM
+
+    classDef svc fill:#e8f0fe,stroke:#5b83b7,color:#17406d;
+    class NG,OV,SX,BL,C4,OM svc
+```
+
+<details>
+<summary>Text-only fallback</summary>
+
+```text
+        ┌─────────────────────────────────────────────┐
+        │ Hermes cron — Sarah orchestrates            │
+        │ daily/weekly packs · scoring · risk · syncs │
+        └───────────────┬─────────────────────────────┘
+                        │ starts trains
+   data & scoring       ▼
+   (scripts/host)   ┌──────────────────────────────────────────┐
+   market data  ───▶│ Draft (Renee·Eliza·Christina·Emily·Alice)│
+   FedWatch ───────▶│        │                                 │
+   journal ────────▶│        ▼                                 │
+                    │  Zoe IC gate (challenge only)            │
+                    │        │                                 │
+                    │        ▼                                 │
+                    │  *-revised.md → reports/inbox            │
+                    └────┬───────────────────────────┬─────────┘
+                         │                           │
+            sync_reports_www.sh (30m)       sync_memory_to_ov.py (30m)
+                         ▼                           │
+              nginx reports-server :8080      OpenViking memory
+              → /reports/ portal              viking://user/<profile>/...
+
+   sidecars: SearXNG · Browserless · Crawl4AI (search / browser / crawl)
+```
+
+</details>
 
 ## Key docs
 
